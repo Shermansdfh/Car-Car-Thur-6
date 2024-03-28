@@ -1,6 +1,8 @@
 import logging
 from time import sleep
 
+# git test
+
 from serial import Serial
 from serial.serialutil import SerialException
 
