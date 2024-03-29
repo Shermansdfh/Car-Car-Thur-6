@@ -27,7 +27,7 @@ void MotorInverter(int motor, bool& dir) {
 // P/PID control Tracking
 void tracking(int l2, int l1, int m0, int r1, int r2) {
     // TODO: find your own parameters!
-    double _w0;  //
+    double _w0 = 0;  //
     double _w1;  //
     double _w2;  //
     double _Kp;  // p term parameter
