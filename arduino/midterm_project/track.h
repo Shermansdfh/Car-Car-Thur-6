@@ -28,10 +28,16 @@ void MotorInverter(int motor, bool& dir) {
 void tracking(int l2, int l1, int m0, int r1, int r2) {
     // TODO: find your own parameters!
     double _w0 = 0;  //
+<<<<<<< HEAD
     double _w1 = 2;  //
     double _w2 = 10;  //
     double _Kp = 30;  // p term parameter
     double Tp = 140;
+=======
+    double _w1;  //
+    double _w2;  //
+    double _Kp;  // p term parameter
+>>>>>>> d5af5a39ce1f2df72017e11d2b68d6e4fad25252
     double _Kd;  // d term parameter (optional)
     double _Ki;  // i term parameter (optional) (Hint: 不要調太大)
     double error;
