@@ -36,19 +36,24 @@ class Maze:
         rows = self.raw_data.shape[0]
         cols = 5; # index, North, South, West, East
         
-        for ix in range(1, rows): # the first row of csv is string, so for idx of self.nodes, ix = idx + 1
+        # for idx of self.nodes, ix = idx
+        # for real index - 1 = ix = idx
+        for ix in range(rows): 
             index = int(self.raw_data[ix, 0])
             node = Node(index)
             self.nodes.append(node)
             self.node_dict[index] = node # add to nd_dict by {key(index): value(corresponding node)}
         
-        for ix in range(1, rows):    
+        for ix in range(rows):    
             for iy in range(1, cols): # iy stands for NORTH = 1, SOUTH = 2. WEST = 3, EAST = 4
-                cell_read = int(self.raw_data[ix,iy])
+                if self.raw_data[ix,iy] == self.raw_data[ix,iy]:
+                    cell_read = int(self.raw_data[ix,iy])
+                else:
+                    cell_read = 0
                 
                 # adjacency list
-                if not (cell_read.isnan()): # if cell_read isn't empty (i.e. NaN) 
-                    self.nodes[ix - 1].set_successor(self.nodes[cell_read - 1], iy)        
+                if (cell_read): # if cell_read isn't empty (i.e. NaN) 
+                    self.nodes[ix].set_successor(self.nodes[cell_read - 1], iy)        
 
     def get_start_point(self):
         if len(self.node_dict) < 2:
@@ -94,3 +99,5 @@ class Maze:
 
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
+
+Maze(r"C:\Users\88696\Downloads\maze.csv")

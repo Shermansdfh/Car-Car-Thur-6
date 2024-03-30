@@ -16,8 +16,8 @@ class Direction(IntEnum):
 class Node:
     def __init__(self, index: int = 0):
         self.index = index
-        # store successor as (Node, direction to node, distance)
-        self.successors = []
+        # successor is a list with tuple (Node, direction to node, distance)
+        self.successors = [] 
 
     def get_index(self):
         return self.index
@@ -27,7 +27,8 @@ class Node:
 
     def set_successor(self, successor, direction, length=1):
         self.successors.append((successor, Direction(direction), int(length)))
-        print(f"For Node {self.index}, a successor {self.successors[-1]} is set.")
+        # print(f"For Node {self.index}, a successor {self.successors[-1]} is set.") what does the [-1] means
+        print(f"For Node {self.index}, a successor Node {self.successors[-1][0].index} is set.") 
         return
 
     def get_direction(self, node):
