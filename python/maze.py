@@ -46,6 +46,7 @@ class Maze:
         
         for ix in range(rows):    
             for iy in range(1, cols): # iy stands for NORTH = 1, SOUTH = 2. WEST = 3, EAST = 4
+                # make NaN = 0
                 if self.raw_data[ix,iy] == self.raw_data[ix,iy]:
                     cell_read = int(self.raw_data[ix,iy])
                 else:
@@ -63,6 +64,15 @@ class Maze:
 
     def get_node_dict(self):
         return self.node_dict
+    
+    def backtrace(self, parent: Node, node_from: Node, node_to: Node):
+        print("backtrace called")
+        path = [node_to]
+        while path[-1] != node_from:
+            idx = path[-1].get_index()
+            path.append(parent[idx])
+        path.reverse()
+        return path
 
     def BFS(self, node: Node):
         # TODO : design your data structure here for your algorithm
@@ -70,9 +80,33 @@ class Maze:
         return None
 
     def BFS_2(self, node_from: Node, node_to: Node):
-        # TODO : similar to BFS but with fixed start point and end point
-        # Tips : return a sequence of nodes of the shortest path
-        return None
+        # BFS with fixed start point and end point
+        # return a sequence of nodes of the shortest path
+        
+        parent = {} # key: index, value: the correspond parent node
+        queue = [node_from] # push start node into queue
+        visited = set()
+        visited.add(node_from)
+        # dis = {node_from: 0} if distance is needed, ill write another function for it
+        
+        # BFS
+        while queue:
+            now_node = queue.pop(0) # get the first node in the queue
+            now_idx = now_node.get_index()
+            
+            if now_idx == node_to.get_index(): # found
+                # return dis[now_node]
+                return self.backtrace(parent, node_from, node_to)
+
+            successors = self.node_dict[now_idx].get_successors()
+            
+            for succ in successors:
+                succ_node, _, _ = succ
+                if succ_node not in visited:
+                    parent[succ_node.get_index()] = now_node
+                    queue.append(succ_node)
+                    visited.add(succ_node)
+                    # dis[succ_node] = dis[now_node] + 1
 
     def getAction(self, car_dir, node_from: Node, node_to: Node):
         # TODO : get the car action
@@ -100,4 +134,7 @@ class Maze:
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
 
-Maze(r"C:\Users\88696\Downloads\maze.csv")
+maze = Maze(r"C:\Users\88696\Downloads\maze.csv")
+seq = maze.strategy_2(Node(1),Node(8))
+for i in range(len(seq)):
+    print(seq[i].get_index())

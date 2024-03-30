@@ -28,7 +28,7 @@ class Node:
     def set_successor(self, successor, direction, length=1):
         self.successors.append((successor, Direction(direction), int(length)))
         # print(f"For Node {self.index}, a successor {self.successors[-1]} is set.") what does the [-1] means
-        print(f"For Node {self.index}, a successor Node {self.successors[-1][0].index} is set.") 
+        print(f"For Node {self.index}, a successor Node {self.successors[-1][0].get_index()} is set.") 
         return
 
     def get_direction(self, node):
@@ -52,7 +52,7 @@ class Node:
     
     def successor_print(self):
         for succ in self.successors:
-            print(succ[0].index)
+            print(succ[0].get_index())
 
 """
 # Test cases
@@ -64,6 +64,7 @@ node4 = Node(4)
 # Set successors for node1
 node1.set_successor(node2, 4)
 node1.set_successor(node3, 2)
+
 
 # print the successors' idx
 node1.successor_print()
