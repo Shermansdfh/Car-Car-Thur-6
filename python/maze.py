@@ -5,7 +5,8 @@ from enum import IntEnum
 from typing import List
 
 import numpy as np
-import pandas
+import pandas 
+
 
 from node import Direction, Node
 
