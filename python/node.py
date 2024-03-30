@@ -31,9 +31,12 @@ class Node:
         return
 
     def get_direction(self, node):
-        # TODO : if node is adjacent to the present node, return the direction of node from the present node
+        """
+        # if node is adjacent to the present node, return the direction of node from the present node
         # For example, if the direction of node from the present node is EAST, then return Direction.EAST = 4
         # However, if node is not adjacent to the present node, print error message and return 0
+        """
+        
         for succ in self.successors:
             if succ[0] == node:
                 return succ[1]
@@ -45,7 +48,12 @@ class Node:
             if succ[0] == node:
                 return True
         return False
+    
+    def successor_print(self):
+        for succ in self.successors:
+            print(succ[0].index)
 
+"""
 # Test cases
 node1 = Node(1)
 node2 = Node(2)
@@ -54,7 +62,13 @@ node4 = Node(4)
 
 # Set successors for node1
 node1.set_successor(node2, 4)
-node1.set_successor(node3, Direction.SOUTH)
+node1.set_successor(node3, 2)
+
+# print the successors' idx
+node1.successor_print()
+
+# check successors
+print(node1.get_successors()[1][2])
 
 # Check if node4 is a successor of node1
 print(node1.is_successor(node4))  # Output: False
@@ -71,3 +85,4 @@ direction = node1.get_direction(node4)
 # Check Direction enumeration values
 print(Direction.SOUTH == 1)  # Output: False
 print(Direction.SOUTH == 2)  # Output: True
+"""

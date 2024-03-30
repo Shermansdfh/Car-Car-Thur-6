@@ -22,13 +22,33 @@ class Action(IntEnum):
 
 class Maze:
     def __init__(self, filepath: str):
-        # TODO : read file and implement a data structure you like
-        # For example, when parsing raw_data, you may create several Node objects.
-        # Then you can store these objects into self.nodes.
-        # Finally, add to nd_dict by {key(index): value(corresponding node)}
-        self.raw_data = pandas.read_csv(filepath).values
-        self.nodes = []
+        """
+        # read csv file
+        # every node records all its successor
+        # store these objects into self.nodes.
+        # add to nd_dict by {key(index): value(corresponding node)}
+        """
+        
+        self.raw_data = pandas.read_csv(filepath).values # read csv file into a numpy array
+        self.nodes = [] 
         self.node_dict = dict()  # key: index, value: the correspond node
+        
+        rows = self.raw_data.shape[0]
+        cols = 5; # index, North, South, West, East
+        
+        for ix in range(1, rows): # the first row of csv is string, so for idx of self.nodes, ix = idx + 1
+            index = int(self.raw_data[ix, 0])
+            node = Node(index)
+            self.nodes.append(node)
+            self.node_dict[index] = node # add to nd_dict by {key(index): value(corresponding node)}
+        
+        for ix in range(1, rows):    
+            for iy in range(1, cols): # iy stands for NORTH = 1, SOUTH = 2. WEST = 3, EAST = 4
+                cell_read = int(self.raw_data[ix,iy])
+                
+                # adjacency list
+                if not (cell_read.isnan()): # if cell_read isn't empty (i.e. NaN) 
+                    self.nodes[ix - 1].set_successor(self.nodes[cell_read - 1], iy)        
 
     def get_start_point(self):
         if len(self.node_dict) < 2:
@@ -41,7 +61,7 @@ class Maze:
 
     def BFS(self, node: Node):
         # TODO : design your data structure here for your algorithm
-        # Tips : return a sequence of nodes from the node to the nearest unexplored deadend
+        # Tips : return a sequence of nodes from the node to the nearest unexplored dead end
         return None
 
     def BFS_2(self, node_from: Node, node_to: Node):
