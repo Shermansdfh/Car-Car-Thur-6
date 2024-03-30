@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 
 
 class Action(IntEnum):
+    # Note that the turn in this context stands for turn and advance till next node
     ADVANCE = 1
     U_TURN = 2
     TURN_RIGHT = 3
@@ -66,6 +67,16 @@ class Maze:
         return self.node_dict
     
     def backtrace(self, parent: Node, node_from: Node, node_to: Node):
+        """ tracks path by finding parents till the start node
+
+        Args:
+            parent (Node): a dictionary that records every node's parent
+            node_from (Node): The current node.
+            node_to (Node): The node to move to.
+
+        Returns:
+            list: list of nodes that tracks the path
+        """
         print("backtrace called")
         path = [node_to]
         while path[-1] != node_from:
@@ -80,8 +91,15 @@ class Maze:
         return None
 
     def BFS_2(self, node_from: Node, node_to: Node):
-        # BFS with fixed start point and end point
-        # return a sequence of nodes of the shortest path
+        """ BFS with fixed start point and end point
+
+        Args:
+            node_from (Node): The current node.
+            node_to (Node): The node to move to.
+
+        Returns:
+            list: a sequence of nodes of the shortest path
+        """
         
         parent = {} # key: index, value: the correspond parent node
         queue = [node_from] # push start node into queue
@@ -109,10 +127,45 @@ class Maze:
                     # dis[succ_node] = dis[now_node] + 1
 
     def getAction(self, car_dir, node_from: Node, node_to: Node):
-        # TODO : get the car action
-        # Tips : return an action and the next direction of the car if the node_to is the Successor of node_to
-        # If not, print error message and return 0
-        return None
+        """
+        Get the action required to move from node_from to node_to, given the current car direction.
+
+        Args:
+            car_dir (Direction): The current direction the car is facing.
+            node_from (Node): The current node.
+            node_to (Node): The node to move to.
+
+        Returns:
+            Tuple[Action, Direction]: A tuple containing the required action and the new direction after taking the action.
+            If node_to is not a valid successor of node_from, returns (None, None).
+        """
+        node_from_idx = node_from.get_index()
+        node_to_idx = node_to.get_index()
+        
+        directions = [Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST]
+        
+        diff_of_direct = self.node_dict[node_from_idx].get_direction(self.node_dict[node_to_idx])
+        
+        if self.node_dict[node_from_idx].is_successor(self.node_dict[node_to_idx]):
+            
+            right_turn_cnt = directions.index(diff_of_direct) - directions.index(car_dir)
+            
+            if right_turn_cnt < 0:
+                right_turn_cnt += 4  
+            
+            if right_turn_cnt == 0:
+                return Action.ADVANCE, Direction(diff_of_direct)
+            elif right_turn_cnt == 1:
+                return Action.TURN_RIGHT, Direction(diff_of_direct)
+            elif right_turn_cnt == 2:
+                return Action.U_TURN, Direction(diff_of_direct)
+            elif right_turn_cnt == 3:
+                return Action.TURN_LEFT, Direction(diff_of_direct)
+             
+        else: 
+            print(f"Error: Node {node_from_idx} is not adjacent to Node {node_to_idx}.") 
+            return 0
+        
 
     def getActions(self, nodes: List[Node]):
         # TODO : given a sequence of nodes, return the corresponding action sequence
@@ -134,7 +187,8 @@ class Maze:
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
 
-maze = Maze(r"C:\Users\88696\Downloads\maze.csv")
+maze = Maze(r"") # May change into ones filepath
 seq = maze.strategy_2(Node(1),Node(8))
 for i in range(len(seq)):
     print(seq[i].get_index())
+print(maze.getAction(Direction.NORTH, Node(1),Node(4)))
