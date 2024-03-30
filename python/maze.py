@@ -77,11 +77,14 @@ class Maze:
         Returns:
             list: list of nodes that tracks the path
         """
+        
         print("backtrace called")
+        
         path = [node_to]
         while path[-1] != node_from:
             idx = path[-1].get_index()
             path.append(parent[idx])
+            
         path.reverse()
         return path
 
@@ -116,7 +119,7 @@ class Maze:
                 # return dis[now_node]
                 return self.backtrace(parent, node_from, node_to)
 
-            successors = self.node_dict[now_idx].get_successors()
+            successors = self.get_node_dict()[now_idx].get_successors()
             
             for succ in successors:
                 succ_node, _, _ = succ
@@ -144,23 +147,23 @@ class Maze:
         
         directions = [Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST]
         
-        diff_of_direct = self.node_dict[node_from_idx].get_direction(self.node_dict[node_to_idx])
+        direction_diff = self.get_node_dict()[node_from_idx].get_direction(self.get_node_dict()[node_to_idx])
         
-        if self.node_dict[node_from_idx].is_successor(self.node_dict[node_to_idx]):
+        if self.get_node_dict()[node_from_idx].is_successor(self.get_node_dict()[node_to_idx]):
             
-            right_turn_cnt = directions.index(diff_of_direct) - directions.index(car_dir)
+            right_turn_cnt = directions.index(direction_diff) - directions.index(car_dir)
             
             if right_turn_cnt < 0:
                 right_turn_cnt += 4  
             
             if right_turn_cnt == 0:
-                return Action.ADVANCE, Direction(diff_of_direct)
+                return Action.ADVANCE, Direction(direction_diff)
             elif right_turn_cnt == 1:
-                return Action.TURN_RIGHT, Direction(diff_of_direct)
+                return Action.TURN_RIGHT, Direction(direction_diff)
             elif right_turn_cnt == 2:
-                return Action.U_TURN, Direction(diff_of_direct)
+                return Action.U_TURN, Direction(direction_diff)
             elif right_turn_cnt == 3:
-                return Action.TURN_LEFT, Direction(diff_of_direct)
+                return Action.TURN_LEFT, Direction(direction_diff)
              
         else: 
             print(f"Error: Node {node_from_idx} is not adjacent to Node {node_to_idx}.") 
