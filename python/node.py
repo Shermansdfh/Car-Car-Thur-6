@@ -50,6 +50,12 @@ class Node:
                 return True
         return False
     
+    def is_dead_end(self, node):
+        if len(node.get_successors()) == 1:
+            return True
+        else:
+            return False
+    
     def successor_print(self):
         for succ in self.successors:
             print(succ[0].get_index())

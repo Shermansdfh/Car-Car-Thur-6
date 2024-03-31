@@ -22,23 +22,28 @@ class Action(IntEnum):
 
 
 class Maze:
+    # TODO: determine when and where to record explored dead end
+    
     def __init__(self, filepath: str):
         """
         # read csv file
         # every node records all its successor
         # store these objects into self.nodes.
         # add to nd_dict by {key(index): value(corresponding node)}
+        
+        Note:
+            For idx of self.nodes, ix = idx
+            For real index of node, real_idx - 1 = ix = idx
         """
         
         self.raw_data = pandas.read_csv(filepath).values # read csv file into a numpy array
         self.nodes = [] 
         self.node_dict = dict()  # key: index, value: the correspond node
+        self.explored_dead_end_dict = dict()
         
         rows = self.raw_data.shape[0]
         cols = 5; # index, North, South, West, East
         
-        # for idx of self.nodes, ix = idx
-        # for real index - 1 = ix = idx
         for ix in range(rows): 
             index = int(self.raw_data[ix, 0])
             node = Node(index)
@@ -47,6 +52,7 @@ class Maze:
         
         for ix in range(rows):    
             for iy in range(1, cols): # iy stands for NORTH = 1, SOUTH = 2. WEST = 3, EAST = 4
+                
                 # make NaN = 0
                 if self.raw_data[ix,iy] == self.raw_data[ix,iy]:
                     cell_read = int(self.raw_data[ix,iy])
@@ -68,14 +74,14 @@ class Maze:
     
     def backtrace(self, parent: Node, node_from: Node, node_to: Node):
         """ tracks path by finding parents till the start node
-
+            
         Args:
             parent (Node): a dictionary that records every node's parent
             node_from (Node): The current node.
             node_to (Node): The node to move to.
 
         Returns:
-            list: list of nodes that tracks the path
+            List[Node]: A list of nodes that tracks the path.
         """
         
         print("backtrace called")
@@ -89,9 +95,38 @@ class Maze:
         return path
 
     def BFS(self, node: Node):
-        # TODO : design your data structure here for your algorithm
-        # Tips : return a sequence of nodes from the node to the nearest unexplored dead end
-        return None
+        """ BFS that finds the nearest unexplored node and return the path.
+            Records the explored dead end.
+
+        Args:
+            node (Node): The current node.
+
+        Returns:
+            List[Node]: A list of nodes of the shortest path.
+        """
+        
+        parent = {} # key: index, value: the correspond parent node
+        queue = [node] # push start node into queue
+        visited = set()
+        visited.add(node)
+        
+        # BFS
+        while queue:
+            now_node = queue.pop(0) # get the first node in the queue
+            now_idx = now_node.get_index()
+            
+            if self.get_node_dict()[now_idx].is_dead_end() & self.get_node_dict()[now_idx] not in self.explored_dead_end_dict: # found
+                self.explored_dead_end_dict[now_idx] = self.get_node_dict()[now_idx] # 
+                return self.backtrace(parent, node, self.get_node_dict()[now_idx])
+
+            successors = self.get_node_dict()[now_idx].get_successors()
+            
+            for succ in successors:
+                succ_node, _, _ = succ
+                if succ_node not in visited:
+                    parent[succ_node.get_index()] = now_node
+                    queue.append(succ_node)
+                    visited.add(succ_node)
 
     def BFS_2(self, node_from: Node, node_to: Node):
         """ BFS with fixed start point and end point
@@ -101,7 +136,7 @@ class Maze:
             node_to (Node): The node to move to.
 
         Returns:
-            list: a sequence of nodes of the shortest path
+            List[Node]: A list of nodes of the shortest path.
         """
         
         parent = {} # key: index, value: the correspond parent node
@@ -130,8 +165,7 @@ class Maze:
                     # dis[succ_node] = dis[now_node] + 1
 
     def getAction(self, car_dir, node_from: Node, node_to: Node):
-        """
-        Get the action required to move from node_from to node_to, given the current car direction.
+        """ Get the action required to move from node_from to node_to, given the current car direction.
 
         Args:
             car_dir (Direction): The current direction the car is facing.
@@ -141,6 +175,9 @@ class Maze:
         Returns:
             Tuple[Action, Direction]: A tuple containing the required action and the new direction after taking the action.
             If node_to is not a valid successor of node_from, returns (None, None).
+            
+        Note:
+            The "turn of Action" in this context stands for turn and advance till next node.
         """
         node_from_idx = node_from.get_index()
         node_to_idx = node_to.get_index()
@@ -166,17 +203,45 @@ class Maze:
                 return Action.TURN_LEFT, Direction(direction_diff)
              
         else: 
-            print(f"Error: Node {node_from_idx} is not adjacent to Node {node_to_idx}.") 
+            log.error(f"Error: Node {node_from_idx} is not adjacent to Node {node_to_idx}.") 
             return 0
         
 
     def getActions(self, nodes: List[Node]):
-        # TODO : given a sequence of nodes, return the corresponding action sequence
-        # Tips : iterate through the nodes and use getAction() in each iteration
-        return None
+        """ Given a sequence of nodes, return the corresponding action sequence.
+
+        Args:
+            nodes (List[Node]): A list of nodes representing the path.
+
+        Returns:
+            List[Action]: A list of actions required to move along the given path.
+        """
+
+        now_direction = self.get_node_dict()[nodes[0].get_index()].get_direction(self.get_node_dict()[nodes[1].get_index()]) # initial direction
+        actions = []
+        for i in range(len(nodes) - 1):
+            action, now_direction = self.getAction(now_direction, nodes[i], nodes[i + 1])
+            if action is not None:
+                actions.append(action)
+            else:
+                log.error(f"Error: Could not find action to move from Node {nodes[i].get_index()} to Node {nodes[i + 1].get_index()}")
+                break
+        return actions
 
     def actions_to_str(self, actions):
-        # cmds should be a string sequence like "fbrl....", use it as the input of BFS checklist #1
+        """ Turn a list of action into a string like "fbrl....", used as the input of BFS checklist #1
+
+        Args:
+            actions (List[Action]): A list of actions
+
+        Returns:
+            string: command of actions, in which 
+                f for advance forward, 
+                b for u turn and advance, 
+                r for right turn and advance, and
+                l for left turn and advance. 
+        """
+        
         cmd = "fbrls"
         cmds = ""
         for action in actions:
@@ -190,8 +255,5 @@ class Maze:
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
 
-maze = Maze(r"") # May change into ones filepath
-seq = maze.strategy_2(Node(1),Node(8))
-for i in range(len(seq)):
-    print(seq[i].get_index())
-print(maze.getAction(Direction.NORTH, Node(1),Node(4)))
+maze = Maze(r"") # May plug ones filepath of maze into ""
+print(maze.actions_to_str(maze.getActions(maze.strategy_2(Node(1),Node(12)))))
