@@ -17,7 +17,29 @@ int extern _Tp;
 // Write the voltage to motor.
 void MotorWriting(double vL, double vR) {
     // TODO: use TB6612 to control motor voltage & direction
-}  // MotorWriting
+    //vL, vR belongs to [-255, 255]
+    if (vL >= 0) { //L forward
+        analogWrite(PWMA, vL); 
+        digitalWrite(AIN1, LOW);
+        digitalWrite(AIN2, HIGH);
+    }
+    else { //L backward
+        analogWrite(PWMA, -vL); 
+        digitalWrite(AIN1, HIGH);
+        digitalWrite(AIN2, LOW);
+    }
+    if (vR >= 0) { //R forward
+        analogWrite(PWMB, vR); 
+        digitalWrite(BIN1, HIGH);
+        digitalWrite(BIN2, LOW);
+    }
+    else { //R backward
+        analogWrite(PWMB, -vR); 
+        digitalWrite(BIN1, LOW);
+        digitalWrite(BIN2, HIGH);
+    }
+}
+
 
 // Handle negative motor_PWMR value.
 void MotorInverter(int motor, bool& dir) {

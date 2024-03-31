@@ -130,6 +130,7 @@ class Maze:
 
     def BFS_2(self, node_from: Node, node_to: Node):
         """ BFS with fixed start point and end point
+            If distance is needed, write another function for it
 
         Args:
             node_from (Node): The current node.
@@ -143,7 +144,7 @@ class Maze:
         queue = [node_from] # push start node into queue
         visited = set()
         visited.add(node_from)
-        # dis = {node_from: 0} if distance is needed, ill write another function for it
+        # dis = {node_from: 0} 
         
         # BFS
         while queue:
@@ -235,7 +236,7 @@ class Maze:
             actions (List[Action]): A list of actions
 
         Returns:
-            string: command of actions, in which 
+            String: command of actions, in which 
                 f for advance forward, 
                 b for u turn and advance, 
                 r for right turn and advance, and
