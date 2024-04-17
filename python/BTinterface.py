@@ -25,6 +25,7 @@ class BTInterface:
     def start(self):
         input("Press enter to start.")
         self.bt.serial_write_string("s")
+        return
 
     def get_UID(self):
         return self.bt.serial_read_byte()
@@ -33,16 +34,18 @@ class BTInterface:
     # send the action to car
         if dir == "forward":
             self.bt.serial_write_string("f")
+            print("f")
             log.info("Sending forward command")
         elif dir == "backward":
             self.bt.serial_write_string("b")
-            log.info("Sending backward command")
+            log.info("Sending back turn command")
         elif dir == "left":
+            print("l")
             self.bt.serial_write_string("l")
-            log.info("Sending left command")
+            log.info("Sending left turn command")
         elif dir == "right":
             self.bt.serial_write_string("r")
-            log.info("Sending right command")
+            log.info("Sending right turn command")
         else:
             log.warning(f"Invalid action: {dir}")
         return
@@ -53,10 +56,10 @@ class BTInterface:
 
 
 if __name__ == "__main__":
-    test = BTInterface()
-    test.start()
+    test = BTInterface("COM5")
+    # test.start()
     test.send_action("forward")  # Move the car forward
     sleep(2)  
     test.send_action("left")  # Turn left
     sleep(1)  
-    test.end_process()
+    test.end_process() 

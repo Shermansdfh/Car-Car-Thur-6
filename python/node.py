@@ -32,11 +32,18 @@ class Node:
         return
 
     def get_direction(self, node):
-        """
+        """"
         # if node is adjacent to the present node, return the direction of node from the present node
         # For example, if the direction of node from the present node is EAST, then return Direction.EAST = 4
         # However, if node is not adjacent to the present node, print error message and return 0
+
+        Args:
+            node (Node): Should be a adjacent node of self.
+
+        Returns:
+            Direction: The direction from self to given adjacent node.
         """
+
         
         for succ in self.successors:
             if succ[0] == node:
@@ -50,8 +57,8 @@ class Node:
                 return True
         return False
     
-    def is_dead_end(self, node):
-        if len(node.get_successors()) == 1:
+    def is_dead_end(self):
+        if len(self.get_successors()) == 1:
             return True
         else:
             return False
@@ -70,6 +77,10 @@ node4 = Node(4)
 # Set successors for node1
 node1.set_successor(node2, 4)
 node1.set_successor(node3, 2)
+node2.set_successor(node3, 2)
+
+print(node1.is_dead_end())
+print(node2.is_dead_end())
 
 
 # print the successors' idx

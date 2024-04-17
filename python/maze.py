@@ -115,8 +115,12 @@ class Maze:
             now_node = queue.pop(0) # get the first node in the queue
             now_idx = now_node.get_index()
             
-            if self.get_node_dict()[now_idx].is_dead_end() & self.get_node_dict()[now_idx] not in self.explored_dead_end_dict: # found
-                self.explored_dead_end_dict[now_idx] = self.get_node_dict()[now_idx] # 
+            if (
+                self.get_node_dict()[now_idx].is_dead_end() 
+                & (now_idx != node.get_index()) 
+                & (self.get_node_dict()[now_idx] not in self.explored_dead_end_dict)
+            ): # found
+                self.explored_dead_end_dict[now_idx] = self.get_node_dict()[now_idx]
                 return self.backtrace(parent, node, self.get_node_dict()[now_idx])
 
             successors = self.get_node_dict()[now_idx].get_successors()
@@ -256,5 +260,5 @@ class Maze:
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
 
-maze = Maze(r"") # May plug ones filepath of maze into ""
-print(maze.actions_to_str(maze.getActions(maze.strategy_2(Node(1),Node(12)))))
+maze = Maze(r"C:\Users\88696\Downloads\maze_3.csv") # May plug ones filepath of maze into ""
+print(maze.actions_to_str(maze.getActions(maze.strategy(Node(46)))))
