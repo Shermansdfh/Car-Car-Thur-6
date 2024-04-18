@@ -38,6 +38,7 @@ class BTInterface:
             log.info("Sending forward command")
         elif dir == "backward":
             self.bt.serial_write_string("b")
+            print("b")
             log.info("Sending back turn command")
         elif dir == "left":
             print("l")
@@ -45,6 +46,7 @@ class BTInterface:
             log.info("Sending left turn command")
         elif dir == "right":
             self.bt.serial_write_string("r")
+            print("r")
             log.info("Sending right turn command")
         else:
             log.warning(f"Invalid action: {dir}")
@@ -61,5 +63,13 @@ if __name__ == "__main__":
     test.send_action("forward")  # Move the car forward
     sleep(2)  
     test.send_action("left")  # Turn left
+    sleep(1)  
+    test.send_action("right")  # Turn left
+    sleep(1)  
+    test.send_action("right")  # Turn left
+    sleep(1)  
+    test.send_action("left")  # Turn left
+    sleep(1)  
+    test.send_action("backward")  # Turn left
     sleep(1)  
     test.end_process() 

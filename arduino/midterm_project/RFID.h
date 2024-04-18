@@ -29,6 +29,7 @@ byte* rfid(byte& idSize) {
             Serial.print("id[");
             Serial.print(i);
             Serial.print("]: ");
+            if (id[i] < 10) Serial.print(0);
             Serial.println(id[i], HEX);  // 以16進位顯示UID值
         }
         Serial.println();

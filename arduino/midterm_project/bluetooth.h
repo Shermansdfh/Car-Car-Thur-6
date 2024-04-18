@@ -26,19 +26,19 @@ BT_CMD ask_BT() {
     Serial.println(cmd);
     if (cmd == 'f') {
         message = forward;
-        Serial.println("f");
+        // Serial.println("f");
     }
     else if (cmd == 'b') {
         message = backward;
-        Serial.println("b");
+        // Serial.println("b");
     }
     else if (cmd == 'r') {
         message = rightTurn;
-        Serial.println("r");
+        // Serial.println("r");
     }
     else if (cmd == 'l') {
         message = leftTurn;
-        Serial.println("l");
+        // Serial.println("l");
     }
     // link bluetooth message to BT_CMD command type
 //#ifdef DEBUG

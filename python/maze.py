@@ -260,5 +260,5 @@ class Maze:
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
 
-maze = Maze(r"C:\Users\88696\Downloads\maze_3.csv") # May plug ones filepath of maze into ""
-print(maze.actions_to_str(maze.getActions(maze.strategy(Node(46)))))
+maze = Maze(r"C:\Users\88696\Downloads\maze_0418.csv") # May plug ones filepath of maze into ""
+print(maze.actions_to_str(maze.getActions(maze.strategy_2(Node(3), Node(46)))))

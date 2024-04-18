@@ -12,7 +12,7 @@
 
 /*===========================import variable===========================*/
 int extern _Tp;
-double extern lastError;
+double extern last_error;
 /*===========================import variable===========================*/
 
 // Write the voltage to motor.
@@ -64,16 +64,16 @@ void tracking(int l2, int l1, int m0, int r1, int r2) {
     double _w1 = 0.5;  //
     double _w2 = 3;  //
     double _Kp = 20;  // p term parameter
-    double Tp = 200;
+    double Tp = 100;
     double _Kd = 60;  // d term parameter (optional)
     double _Ki;  // i term parameter (optional) (Hint: 不要調太大)
     double error;
     if (l1 + l2 + r1 + r2)
         double error = (l2 * (-_w2) + l1 * (-_w1) + m0 * _w0 + r1 * _w1 + r2 * _w2)/(l1 + l2 + r1 + r2);
     else error = 0;
-    double dError = error - lastError;
+    double dError = error - last_error;
     double powerCorrection = _Kp * error + _Kd * dError;
-    lastError = error;
+    last_error = error;
     
     // 馬達左右轉速原始值(從PID control 計算出來)。Between -255 to 255.
     // Update vR, vL
