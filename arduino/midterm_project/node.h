@@ -12,3 +12,18 @@ int extern _Tp;
 
 // TODO: add some function to control your car when encounter a node
 // here are something you can try: left_turn, right_turn... etc.
+void turn_left{
+
+}
+
+void turn_right{
+
+}
+
+void turn_around{
+
+}
+
+void go_straight{
+
+}
