@@ -68,8 +68,11 @@ void tracking(int l2, int l1, int m0, int r1, int r2) {
     double _Kd = 60;  // d term parameter (optional)
     double _Ki;  // i term parameter (optional) (Hint: 不要調太大)
     double error;
-    if (l1 + l2 + r1 + r2)
-        double error = (l2 * (-_w2) + l1 * (-_w1) + m0 * _w0 + r1 * _w1 + r2 * _w2)/(l1 + l2 + r1 + r2);
+    double last_error = 0;
+
+    if (l1 + l2 + r1 + r2){
+      error = (l2 * (-_w2) + l1 * (-_w1) + m0 * _w0 + r1 * _w1 + r2 * _w2)/(l1 + l2 + r1 + r2);
+    }
     else error = 0;
     double dError = error - last_error;
     double powerCorrection = _Kp * error + _Kd * dError;

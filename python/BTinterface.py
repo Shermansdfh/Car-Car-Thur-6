@@ -58,18 +58,28 @@ class BTInterface:
 
 
 if __name__ == "__main__":
-    test = BTInterface("COM5")
+    test = BTInterface("COM9")
     # test.start()
-    test.send_action("forward")  # Move the car forward
-    sleep(2)  
-    test.send_action("left")  # Turn left
-    sleep(1)  
-    test.send_action("right")  # Turn left
-    sleep(1)  
-    test.send_action("right")  # Turn left
-    sleep(1)  
-    test.send_action("left")  # Turn left
-    sleep(1)  
-    test.send_action("backward")  # Turn left
-    sleep(1)  
-    test.end_process() 
+    # test.end_process()
+    # 十字地圖
+    test.send_action("forward")
+    test.send_action("right")
+    test.send_action("backward")
+    test.send_action("right")
+    test.send_action("backward")
+    test.send_action("right")
+    test.send_action("backward")
+    test.send_action("right")
+
+'''   藍芽控制
+    while(1):
+        comm = input("command: ")
+        if(comm == 'f'):
+            test.send_action("forward")
+        elif(comm == 'b'):
+            test.send_action("backward")
+        elif(comm == 'r'):
+            test.send_action("right")
+        elif(comm == 'l'):
+            test.send_action("left")
+'''
