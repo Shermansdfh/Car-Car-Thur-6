@@ -42,7 +42,7 @@ class Maze:
         self.explored_dead_end_dict = dict()
         
         rows = self.raw_data.shape[0]
-        cols = 5; # index, North, South, West, East
+        cols = 5 # index, North, South, West, East
         
         for ix in range(rows): 
             index = int(self.raw_data[ix, 0])

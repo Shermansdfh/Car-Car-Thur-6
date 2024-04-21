@@ -59,7 +59,7 @@ class BTInterface:
 
 if __name__ == "__main__":
     test = BTInterface("COM5")
-    # test.start()
+    test.start()
     test.send_action("forward")  # Move the car forward
     sleep(2)  
     test.send_action("left")  # Turn left
