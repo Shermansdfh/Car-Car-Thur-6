@@ -64,12 +64,15 @@ void tracking(int l2, int l1, int m0, int r1, int r2) {
     double _w1 = 0.5;  //
     double _w2 = 3;  //
     double _Kp = 20;  // p term parameter
-    double Tp = 100;
+    double Tp = 150;
     double _Kd = 60;  // d term parameter (optional)
     double _Ki;  // i term parameter (optional) (Hint: 不要調太大)
     double error;
-    if (l1 + l2 + r1 + r2)
-        double error = (l2 * (-_w2) + l1 * (-_w1) + m0 * _w0 + r1 * _w1 + r2 * _w2)/(l1 + l2 + r1 + r2);
+    double last_error = 0;
+
+    if (l1 + l2 + r1 + r2){
+      error = (l2 * (-_w2) + l1 * (-_w1) + m0 * _w0 + r1 * _w1 + r2 * _w2)/(l1 + l2 + r1 + r2);
+    }
     else error = 0;
     double dError = error - last_error;
     double powerCorrection = _Kp * error + _Kd * dError;
@@ -94,20 +97,51 @@ void tracking(int l2, int l1, int m0, int r1, int r2) {
 }  // tracking
 
 void quarterCircleLeft() {
+    /* old track
     MotorWriting(-150, 150);
     delay(425);
+    */
+    // 車車會偏右，左轉檢測兩次直條
+    while(digitalRead(36) == 0){
+        MotorWriting(-120, 120);
+    }
+    while(!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)){
+        MotorWriting(-120, 120);
+    }
+    while(digitalRead(36) == 0){
+        MotorWriting(-120, 120);
+    }
 }
 
 void quarterCircleRight() {
+    /* old track
     MotorWriting(150, -150);
     delay(425);
+    */
+   // 車車會偏右，右轉檢測一次直條
+    while(!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)){
+        MotorWriting(120, -120);
+    }
+    while(digitalRead(36) == 0){
+        MotorWriting(120, -120);
+    }
 }
 
 void uTurn() {
+    /* old track
     MotorWriting(250, -250);
     delay(575);
+    */
+    while(!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)){
+        MotorWriting(150, -150);
+    }
+    while(digitalRead(36) == 0){
+        MotorWriting(150, -150);
+    }
 }
 
+/*
 void slowDown() {
     delay(500);
 }
+*/
