@@ -24,21 +24,3 @@ bool on_node(bool on_node, int l2, int l1, int m0, int r1, int r2) {
             else return false;
     }
 }
-
-/*
-void left_turn{
-    
-}
-
-void right_turn{
-    
-}
-
-void u_turn{
-    
-}
-
-void go_straight{
-
-}
-*/
