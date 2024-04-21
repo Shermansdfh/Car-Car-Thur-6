@@ -10,12 +10,12 @@
 /*check out what you have learned from week 2*/
 
 enum BT_CMD {
-  NOTHING,
-  forward,
-  backward,
-  rightTurn,
-  leftTurn,
-  endProcess
+    NOTHING,
+    forward,
+    backward,
+    rightTurn,
+    leftTurn,
+    endProcess
 };
 
 BT_CMD ask_BT() {
@@ -61,11 +61,14 @@ void send_byte(byte* id, byte& idSize) {
   for (byte i = 0; i < idSize; i++) {  // Send UID consequently.
     Serial1.write(id[i]);
   }
+
 #ifdef DEBUG
   Serial.print("Sent id: ");
   for (byte i = 0; i < idSize; i++) {  // Show UID consequently.
+    if (id[i] < 10) Serial.print(0);
     Serial.print(id[i], HEX);
   }
   Serial.println();
 #endif
+
 }  // send_byte
