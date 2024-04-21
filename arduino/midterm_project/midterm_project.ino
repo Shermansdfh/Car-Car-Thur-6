@@ -116,18 +116,54 @@ void loop() {
         MotorWriting(0, 0);
     else
         Search();
+    // BTtest();  
     SetState();
+}
+
+void BTtest() {
+    _cmd = ask_BT(); // Get command from bluetooth
+    
+    switch(_cmd) {
+        case forward:       
+            Serial.println("FORWARD");
+            tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
+            delay(150);
+            MotorWriting(0,0);
+            break;
+        case backward:
+            Serial.println("BACKWARD");
+            old_u_turn();
+            MotorWriting(0,0);
+            break;
+        case rightTurn:
+            Serial.println("RIGHT");
+            old_quarter_circle_R();
+            tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
+            MotorWriting(0,0);
+            break;
+        case leftTurn:
+            Serial.println("LEFT");
+            old_quarter_circle_L();
+            MotorWriting(0,0);
+            break;
+            
+        case NOTHING:
+            break;
+    }
+
+    delay(1000);
+    MotorWriting(0, 0);
+    // 2. Change state if need
 }
 
 void SetState() {
     _cmd = ask_BT(); // Get command from bluetooth
-    
-    bool on_node = 0;   // 用來記錄到了node
     l2 = digitalRead(IRpin_LL);
     l1 = digitalRead(IRpin_L);
     m0 = digitalRead(IRpin_M);
     r1 = digitalRead(IRpin_R);
     r2 = digitalRead(IRpin_RR);
+    bool on_node = 0;   // 用來記錄到了node
     switch(_cmd) {
         case forward:       
             Serial.println("FORWARD");
@@ -136,12 +172,18 @@ void SetState() {
             delay(500);
             MotorWriting(0, 0);
             */
-            /*while(!(on_node && l2 == 0 && r2 == 0)){
+
+            /*
+            while(!(on_node && l2 == 0 && r2 == 0)){
                 tracking(l2, l1, m0, r1, r2);
                 if (on_node==0 && l2 && l1 && m0 && r1 && r2) {
                     on_node = 1;
                 }
-            }*/
+            }
+            */
+
+            /*
+
             while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)){
                 tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));   
                 rfid(mfrc522.uid.size);
@@ -149,13 +191,15 @@ void SetState() {
                     on_node = 1;
                 }
             }
+            */
+
             tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
             delay(150);
             MotorWriting(0,0);
             break;
         case backward:
             Serial.println("BACKWARD");
-            uTurn();
+            old_u_turn();
             /*
             MotorWriting(_Tp, _Tp); 
             delay(500);
@@ -174,7 +218,8 @@ void SetState() {
             break;
         case rightTurn:
             Serial.println("RIGHT");
-            quarterCircleRight();
+            old_quarter_circle_R();
+      
              /*
             MotorWriting(_Tp, _Tp); 
             delay(500);
@@ -193,7 +238,7 @@ void SetState() {
             break;
         case leftTurn:
             Serial.println("LEFT");
-            quarterCircleLeft();
+            old_quarter_circle_L();
              /*
             MotorWriting(_Tp, _Tp); 
             delay(500);

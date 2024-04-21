@@ -1,6 +1,9 @@
 import logging
 from typing import Optional
 from time import sleep
+import serial
+import sys
+
 
 from BT import Bluetooth
 
@@ -13,6 +16,7 @@ log = logging.getLogger(__name__)
 class BTInterface:
     def __init__(self, port: Optional[str] = None):
         log.info("Arduino Bluetooth Connect Program.")
+        
         self.bt = Bluetooth()
         if port is None:
             port = input("PC bluetooth port name: ")
@@ -21,7 +25,10 @@ class BTInterface:
                 self.bt.disconnect()
                 quit()
             port = input("PC bluetooth port name: ")
-
+            
+    def is_open(self) -> bool:
+        return self.bt.serial.is_open
+        
     def start(self):
         input("Press enter to start.")
         self.bt.serial_write_string("s")
@@ -29,6 +36,11 @@ class BTInterface:
 
     def get_UID(self):
         return self.bt.serial_read_byte()
+
+    def write(self, output: str):
+        # Write the byte to the output buffer, encoded by utf-8.
+        send = output.encode("utf-8")
+        self.bt.serial.write(send)
 
     def send_action(self, dir):
     # send the action to car
@@ -57,25 +69,18 @@ class BTInterface:
         self.bt.disconnect()
 
 
+def write():
+    while True:
+        msgWrite = input()
+
+        if msgWrite == "exit":
+            sys.exit()
+
+        bt.write(msgWrite + "\n")
+
+
 if __name__ == "__main__":
-<<<<<<< HEAD
     test = BTInterface("COM5")
-    test.start()
-    test.send_action("forward")  # Move the car forward
-    sleep(2)  
-    test.send_action("left")  # Turn left
-    sleep(1)  
-    test.send_action("right")  # Turn left
-    sleep(1)  
-    test.send_action("right")  # Turn left
-    sleep(1)  
-    test.send_action("left")  # Turn left
-    sleep(1)  
-    test.send_action("backward")  # Turn left
-    sleep(1)  
-    test.end_process() 
-=======
-    test = BTInterface("COM9")
     # test.start()
     # test.end_process()
     # 十字地圖
@@ -100,4 +105,18 @@ if __name__ == "__main__":
         elif(comm == 'l'):
             test.send_action("left")
 '''
->>>>>>> d0a2d80b7ffb53a85776b9dae397df79f96db81b
+
+''' BT control by write()
+if __name__ == "__main__":
+    bt = BTInterface("COM5")
+    
+    while not bt.is_open():
+        pass
+    print("BT Connected!")
+
+    while True:
+        msgWrite = input()
+        if msgWrite == "exit":
+            sys.exit()
+        bt.write(msgWrite)
+'''

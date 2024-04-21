@@ -97,10 +97,6 @@ void tracking(int l2, int l1, int m0, int r1, int r2) {
 }  // tracking
 
 void quarterCircleLeft() {
-    /* old track
-    MotorWriting(-150, 150);
-    delay(425);
-    */
     // 車車會偏右，左轉檢測兩次直條
     while(digitalRead(36) == 0){
         MotorWriting(-120, 120);
@@ -111,6 +107,11 @@ void quarterCircleLeft() {
     while(digitalRead(36) == 0){
         MotorWriting(-120, 120);
     }
+}
+
+void old_quarter_circle_L() {
+    MotorWriting(-150, 150);
+    delay(425);
 }
 
 void quarterCircleRight() {
@@ -127,17 +128,23 @@ void quarterCircleRight() {
     }
 }
 
+void old_quarter_circle_R() {
+    MotorWriting(150, -150);
+    delay(425);
+}
+
 void uTurn() {
-    /* old track
-    MotorWriting(250, -250);
-    delay(575);
-    */
     while(!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)){
         MotorWriting(150, -150);
     }
     while(digitalRead(36) == 0){
         MotorWriting(150, -150);
     }
+}
+
+void old_u_turn() {
+    MotorWriting(250, -250);
+    delay(575);
 }
 
 /*
