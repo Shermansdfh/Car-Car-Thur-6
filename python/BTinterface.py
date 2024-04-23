@@ -38,7 +38,14 @@ class BTInterface:
     
     def get_string(self):
         return self.bt.serial_read_string()
-
+    
+    def ReadUID(self):
+        uid = self.bt.serial_read_byte()
+        if uid:
+            print(f"UID received: {uid}")
+        else:
+            print("No UID received.")
+    
     def write(self, output: str):
         # Write the byte to the output buffer, encoded by utf-8.
         self.bt.serial.write(output)
@@ -73,16 +80,15 @@ class BTInterface:
 
 
 if __name__ == "__main__":
-    test = BTInterface("COM5")
+    test = BTInterface("COM5") 
     test.start()
+
     while True:
-        print(test.get_UID())
-        msgWrite = input()
-        if msgWrite == "exit":
-            sys.exit()
-#    test.end_process()
-    # 十字地圖
-'''    test.send_action("forward")
+        test.ReadUID()
+    
+    test.end_process()
+''' 十字地圖
+    test.send_action("forward")
     test.send_action("right")
     test.send_action("backward")
     test.send_action("right")
@@ -91,7 +97,7 @@ if __name__ == "__main__":
     test.send_action("backward")
     test.send_action("right")
 '''
-'''   藍芽控制
+''' 藍芽控制
     while(1):
         comm = input("command: ")
         if(comm == 'f'):

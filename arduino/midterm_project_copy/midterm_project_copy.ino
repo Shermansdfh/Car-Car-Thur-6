@@ -21,7 +21,6 @@
 // 18    TX       ->  RX
 // 19    RX       <-  TX
 // TB6612, 請按照自己車上的接線寫入腳位(左右不一定要跟註解寫的一樣)
-// TODO: 請將腳位寫入下方
 
 // IR
 #define IRpin_LL 40
@@ -79,8 +78,12 @@ void SetState();  // switch the state
 
 /*===========================define function===========================*/
 void loop() {
-    byte& idSize = mfrc522.uid.size; 
-    BT.send_byte(rfid(idSize), idSize);
+    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+        byte& idSize = mfrc522.uid.size;
+        rfid(idSize);
+        byte* uid = rfid(idSize);
+        BT.send_byte(uid, idSize); // Send the UID over Bluetooth
+    }
     /*
     if (!state)
         track.MotorWriting(0, 0);

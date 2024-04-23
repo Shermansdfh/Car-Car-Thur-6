@@ -57,11 +57,13 @@ void BluetoothClass::send_msg(const char& msg) {
 
 // send UID back through Serial1(bluetooth serial)
 void BluetoothClass::send_byte(byte* id, byte& idSize) {
-    ///Serial1.write('$');
+    Serial.print("send_byte called!\n");
+    
     for (byte i = 0; i < idSize; i++) {
         // Send UID consequently.
-        if (id[i] < 10)
+        if (id[i] < 10) {
             Serial1.write(0);
+        }
         Serial1.write(id[i]);
     }
 
@@ -69,15 +71,13 @@ void BluetoothClass::send_byte(byte* id, byte& idSize) {
     Serial.print("Sent id: ");
     for (byte i = 0; i < idSize; i++) {
         // Show UID consequently.
-        /*
-        if (id[i] < 10)
+        if (id[i] < 10) {
             Serial.print(0);
-        */
+        }
         Serial.print(id[i], HEX);
     }
     Serial.println();
 #endif
-
 }
 
 BluetoothClass BT = BluetoothClass();
