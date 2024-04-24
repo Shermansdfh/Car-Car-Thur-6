@@ -19,35 +19,35 @@ enum BT_CMD {
 };
 
 BT_CMD ask_BT() {
-  BT_CMD message = NOTHING;
-  char cmd;
-  if (Serial1.available()) {
-    cmd = Serial1.read();                // get cmd from Serial1(bluetooth serial)
-    Serial.println(cmd);
-    if (cmd == 'f') {
-        message = forward;
-        // Serial.println("f");
-    }
-    else if (cmd == 'b') {
-        message = backward;
-        // Serial.println("b");
-    }
-    else if (cmd == 'r') {
-        message = rightTurn;
-        // Serial.println("r");
-    }
-    else if (cmd == 'l') {
-        message = leftTurn;
-        // Serial.println("l");
-    }
+    BT_CMD message = NOTHING;
+    char cmd;
+    if (Serial1.available()) {
+        cmd = Serial1.read();                // get cmd from Serial1(bluetooth serial)
+        Serial.println(cmd);
+        if (cmd == 'f') {
+            message = forward;
+            // Serial.println("f");
+        }
+        else if (cmd == 'b') {
+            message = backward;
+            // Serial.println("b");
+        }
+        else if (cmd == 'r') {
+            message = rightTurn;
+            // Serial.println("r");
+        }
+        else if (cmd == 'l') {
+            message = leftTurn;
+            // Serial.println("l");
+        }
     // link bluetooth message to BT_CMD command type
-//#ifdef DEBUG
-//    Serial.print("cmd : ");
-//    Serial.println(cmd);
-//#endif
-  }
-  return message;
-}  // ask_BT
+#ifdef DEBUG
+    Serial.print("cmd : ");
+    Serial.println(cmd);
+#endif
+    }
+    return message;
+}
 
 // send msg back through Serial1(bluetooth serial)
 // can use send_byte alternatively to send msg back
