@@ -157,8 +157,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
     try:
-        # scoreboard = ScoreboardServer("TeamName2", "http://140.112.175.18:5000")
-        scoreboard = ScoreboardFake("TeamName", "data/fakeUID.csv")
+        scoreboard = ScoreboardServer("Thur-6", "http://140.112.175.18:5000")
+        # scoreboard = ScoreboardFake("TeamName", "data/fakeUID.csv")
         time.sleep(1)
 
         score, time_remaining = scoreboard.add_UID("10BA617E")
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         log.info(f"Current score: {current_score}")
         time.sleep(1)
 
-        score, time_remaining = scoreboard.add_UID("556D04D6")
+        score, time_remaining = scoreboard.add_UID("6349A831")
         current_score = scoreboard.get_current_score()
         log.info(f"Current score: {current_score}")
         time.sleep(1)

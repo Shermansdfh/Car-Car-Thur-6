@@ -169,6 +169,27 @@ class Maze:
                     visited.add(succ_node)
                     # dis[succ_node] = dis[now_node] + 1
 
+    def ManhattanDistance(self, node_from: Node, node_to: Node, maze_height: int):
+        """ Calculate Manhattan distance between two nodes.
+
+        Args:
+            node_from (Node): The current node.
+            node_to (Node): The node to move to.
+
+        Returns:
+            int: The Manhattan distance between the two nodes.
+        """
+        
+        node_from_idx = node_from.get_index()
+        node_to_idx = node_to.get_index()
+        
+        x1 = node_from_idx / maze_height + 1
+        x2 = node_to_idx / maze_height + 1
+        y1 = node_from_idx - maze_height * (x1 - 1)
+        y2 = node_to_idx - maze_height * (x2 - 1)
+        
+        return abs(x1 - x2) + abs(y1 - y2)
+
     def getAction(self, car_dir, node_from: Node, node_to: Node):
         """ Get the action required to move from node_from to node_to, given the current car direction.
 
@@ -211,7 +232,6 @@ class Maze:
             log.error(f"Error: Node {node_from_idx} is not adjacent to Node {node_to_idx}.") 
             return 0
         
-
     def getActions(self, nodes: List[Node]):
         """ Given a sequence of nodes, return the corresponding action sequence.
 

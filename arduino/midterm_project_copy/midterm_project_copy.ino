@@ -57,6 +57,7 @@ void setup() {
     pinMode(IRpin_M, INPUT);
     pinMode(IRpin_R, INPUT);
     pinMode(IRpin_RR, INPUT);
+    
 #ifdef DEBUG
     Serial.println("Start!");
 #endif
@@ -182,13 +183,13 @@ void SetState() {
             while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)){
                 track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
                 rfid(mfrc522.uid.size);
-                if (on_node==0 && digitalRead(IRpin_LL) && digitalRead(IRpin_L) && digitalRead(IRpin_M) && digitalRead(IRpin_R) && digitalRead(IRpin_RR)) {
+                if (on_node == 0 && digitalRead(IRpin_LL) && digitalRead(IRpin_L) && digitalRead(IRpin_M) && digitalRead(IRpin_R) && digitalRead(IRpin_RR)) {
                     on_node = 1;
                 }
             }
             track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
             delay(100);
-            track.MotorWriting(0,0);
+            track.MotorWriting(0, 0);
             break;
         case BluetoothClass::RightTurn:
             Serial.println("RIGHT");

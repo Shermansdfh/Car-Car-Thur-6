@@ -5,6 +5,7 @@ import serial
 import sys
 
 from node import Direction
+from maze import Action
 from BT import Bluetooth
 
 log = logging.getLogger(__name__)
@@ -50,10 +51,35 @@ class BTInterface:
         # Write the byte to the output buffer, encoded by utf-8.
         self.bt.serial.write(output)
         return
-
+    
+    def send_action_through_enum(self, action: Action):
+    # Send the action to the car
+        if action == Action.ADVANCE:
+            self.bt.serial_write_string("f")
+            print("f")
+            log.info("Sending forward command")
+        elif action == Action.U_TURN:
+            self.bt.serial_write_string("b")
+            print("b")
+            log.info("Sending back turn command")
+        elif action == Action.TURN_RIGHT:
+            self.bt.serial_write_string("r")
+            print("r")
+            log.info("Sending right turn command")
+        elif action == Action.TURN_LEFT:
+            self.bt.serial_write_string("l")
+            print("l")
+            log.info("Sending left turn command")
+        elif action == Action.HALT:
+            log.info("Halting the car")
+            self.bt.serial_write_string("h")
+            print("l")
+        else:
+            log.warning(f"Invalid action: {action}")
+        return
+    
     def send_action(self, dir):
     # send the action to car
-    # TODO: Turn dir into enum DIRECTION from node.py
         if dir == "forward":
             self.bt.serial_write_string("f")
             print("f")
@@ -87,7 +113,8 @@ if __name__ == "__main__":
         test.ReadUID()
     
     test.end_process()
-''' 十字地圖
+    
+''' 十字地圖測試
     test.send_action("forward")
     test.send_action("right")
     test.send_action("backward")
@@ -97,7 +124,8 @@ if __name__ == "__main__":
     test.send_action("backward")
     test.send_action("right")
 '''
-''' 藍芽控制
+
+''' 藍芽控制測試
     while(1):
         comm = input("command: ")
         if(comm == 'f'):
@@ -110,7 +138,7 @@ if __name__ == "__main__":
             test.send_action("left")
 '''
 
-''' BT control by write()
+''' BT control write()測試
 if __name__ == "__main__":
     bt = BTInterface("COM5")
     
