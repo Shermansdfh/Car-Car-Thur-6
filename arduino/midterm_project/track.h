@@ -139,7 +139,7 @@ void slowDown() {
 */
 
 /*以下為轉彎函數 by鄭睿昕*/
-void left_turn_3rd{
+void left_turn_3rd(){
     while(digitalRead(40) == 1 && digitalRead(32) == 1){    // 兩邊有任一偵測到白，則停止
         MotorWriting(50, 52);   //讓車自盡量不偏右
     }
@@ -179,7 +179,7 @@ void left_turn_3rd{
     }
 }
 
-void right_turn_3rd{
+void right_turn_3rd(){
     while(digitalRead(40) == 1 && digitalRead(32) == 1){    // 兩邊有任一偵測到白，則停止
         MotorWriting(50, 52);   //讓車自盡量不偏右
     }
@@ -219,7 +219,7 @@ void right_turn_3rd{
     }
 }
 
-void u_turn_3rd{
+void u_turn_3rd(){
     while(digitalRead(40) == 1 && digitalRead(32) == 1){    // 兩邊有任一偵測到白，則停止
         MotorWriting(50, 52);   //讓車自盡量不偏右
     }
