@@ -79,20 +79,22 @@ void SetState();  // switch the state
 
 /*===========================define function===========================*/
 void loop() {
+    /*
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
         byte& idSize = mfrc522.uid.size;
         rfid(idSize);
         byte* uid = rfid(idSize);
         BT.send_byte(uid, idSize); // Send the UID over Bluetooth
     }
+    */
     /*
     if (!state)
         track.MotorWriting(0, 0);
     else
         Search();
     // BTtest();  
-    SetState();
     */
+    SetState();
 }
 
 /*
@@ -168,13 +170,14 @@ void SetState() {
                 }
             }
 
-            track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
+            track.MotorWriting(_Tp, _Tp);
             delay(150);
             track.MotorWriting(0,0);
             break;
+
         case BluetoothClass::Backward:
             Serial.println("BACKWARD");
-            track.OldUTurn();
+            track.UTurn();
             /*
             track.MotorWriting(_Tp, _Tp); 
             delay(500);
@@ -187,13 +190,13 @@ void SetState() {
                     on_node = 1;
                 }
             }
-            track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
+            track.MotorWriting(_Tp, _Tp);
             delay(100);
             track.MotorWriting(0, 0);
             break;
         case BluetoothClass::RightTurn:
             Serial.println("RIGHT");
-            track.OldQuarterCircleR();
+            track.QuarterCircleRight();
       
              /*
             track.MotorWriting(_Tp, _Tp); 
@@ -207,13 +210,13 @@ void SetState() {
                     on_node = 1;
                 }
             }
-            track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
+            track.MotorWriting(_Tp, _Tp);
             delay(150);
             track.MotorWriting(0,0);
             break;
         case BluetoothClass::LeftTurn:
             Serial.println("LEFT");
-            track.OldQuarterCircleL();
+            track.QuarterCircleLeft();
              /*
             track.MotorWriting(_Tp, _Tp); 
             delay(500);
@@ -226,7 +229,7 @@ void SetState() {
                     on_node = 1;
                 }
             }
-            track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
+            track.MotorWriting(_Tp, _Tp);
             delay(150);
             track.MotorWriting(0,0);
             break;
