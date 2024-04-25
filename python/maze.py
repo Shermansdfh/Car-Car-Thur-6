@@ -34,12 +34,10 @@ class Maze:
             For real index of node, real_idx - 1 = ix = idx
         """
         
-        # TODO: merge explored dead ends dictionary with all dead ends dictionary thru tuple
         self.raw_data = pandas.read_csv(filepath).values # read csv file into a numpy array
         self.total_node_count = self.raw_data.shape[0] # actual total number of nodes (starting from 1)
         self.nodes = [] 
         self.node_dict = {}  # key: index, value: (corresponding node, is_dead_end?(bool), explored_dead_end?(bool))
-        self.explored_dead_end_dict = {}
         
         rows = self.total_node_count 
         cols = 5 # index, North, South, West, East
@@ -63,9 +61,10 @@ class Maze:
                 else:
                     cell_read = 0
                 
+                idx = ix + 1
                 # adjacency list
                 if (cell_read): # if cell_read isn't empty (i.e. NaN) 
-                    self.nodes[ix].set_successor(self.nodes[cell_read - 1], iy)        
+                    self.node_dict[idx][0].set_successor(self.node_dict[cell_read][0], iy)        
 
     def get_start_point(self):
         if len(self.node_dict) < 2:
@@ -76,6 +75,9 @@ class Maze:
     def get_node_number(self):
         return self.total_node_count
 
+    def get_node(self, index: int):
+        return self.node_dict[index][0]
+    
     def get_node_dict(self):
         return self.node_dict
     
@@ -157,14 +159,14 @@ class Maze:
             now_idx = now_node.get_index()
             
             if (
-                self.get_node_dict()[now_idx].is_dead_end() 
+                self.get_node_dict()[now_idx][1] 
                 & (now_idx != node.get_index()) 
-                & (self.get_node_dict()[now_idx] not in self.explored_dead_end_dict)
+                & (self.get_node_dict()[now_idx][2])
             ): # found
-                self.explored_dead_end_dict[now_idx] = self.get_node_dict()[now_idx]
-                return self.backtrace(parent, node, self.get_node_dict()[now_idx])
+                self.DeadEndExplored()
+                return self.backtrace(parent, node, self.get_node(now_idx))
 
-            successors = self.get_node_dict()[now_idx].get_successors()
+            successors = self.get_node(now_idx).get_successors()
             
             for succ in successors:
                 succ_node, _, _ = succ
@@ -200,7 +202,7 @@ class Maze:
                 # return dis[now_node]
                 return self.backtrace(parent, node_from, node_to)
 
-            successors = self.get_node_dict()[now_idx].get_successors()
+            successors = self.get_node(now_idx).get_successors()
             
             for succ in successors:
                 succ_node, _, _ = succ
@@ -269,9 +271,9 @@ class Maze:
         
         directions = [Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST]
         
-        direction_diff = self.get_node_dict()[node_from_idx].get_direction(self.get_node_dict()[node_to_idx])
+        direction_diff = self.get_node(node_from_idx).get_direction(self.get_node(node_to_idx))
         
-        if self.get_node_dict()[node_from_idx].is_successor(self.get_node_dict()[node_to_idx]):
+        if self.get_node(node_from_idx).is_successor(self.get_node(node_to_idx)):
             
             right_turn_cnt = directions.index(direction_diff) - directions.index(car_dir)
             
@@ -301,7 +303,7 @@ class Maze:
             List[Action]: A list of actions required to move along the given path.
         """
 
-        now_direction = self.get_node_dict()[nodes[0].get_index()].get_direction(self.get_node_dict()[nodes[1].get_index()]) # initial direction
+        now_direction = self.get_node(nodes[0].get_index()).get_direction(self.get_node(nodes[1].get_index())) # initial direction
         actions = []
         for i in range(len(nodes) - 1):
             action, now_direction = self.getAction(now_direction, nodes[i], nodes[i + 1])
