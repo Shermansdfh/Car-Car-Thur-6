@@ -52,7 +52,7 @@ BluetoothClass::BT_CMD BluetoothClass::ask_BT() {
 // can use send_byte alternatively to send msg back
 // (but need to convert to byte type)
 void BluetoothClass::send_msg(const char& msg) {
-    Serial1.write(msg);
+    // Serial1.write(msg);
 }
 
 // send UID back through Serial1(bluetooth serial)

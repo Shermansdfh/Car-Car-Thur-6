@@ -10,6 +10,7 @@
 
 #include <MFRC522.h>  // 引用程式庫
 #include <SPI.h>
+#include "bluetooth_copy.h"
 /* pin---- SDA:9 SCK:13 MOSI:11 MISO:12 GND:GND RST:define on your own  */
 
 byte* rfid(byte& idSize) {
@@ -38,4 +39,16 @@ byte* rfid(byte& idSize) {
         return id;
     }
     return 0;
+}
+
+bool DetectRFID() {
+    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+        byte& idSize = mfrc522.uid.size;
+        rfid(idSize);
+        byte* uid = rfid(idSize);
+        BT.send_byte(uid, idSize); // Send the UID over Bluetooth
+        return true
+    }
+    else 
+        return false
 }

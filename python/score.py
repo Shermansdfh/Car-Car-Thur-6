@@ -3,6 +3,7 @@ import csv
 import logging
 import re
 from typing import Optional, Tuple, cast
+from BTinterface import BTInterface
 
 import requests
 import socketio
@@ -153,14 +154,21 @@ class TeamNamespace(socketio.ClientNamespace):
 
 if __name__ == "__main__":
     import time
-
     logging.basicConfig(level=logging.DEBUG)
+    test = BTInterface("COM5") 
 
     try:
         scoreboard = ScoreboardServer("Thur-6", "http://140.112.175.18:5000")
         # scoreboard = ScoreboardFake("TeamName", "data/fakeUID.csv")
         time.sleep(1)
 
+        while True: 
+            uid = test.ReadUID()
+            score, time_remaining = scoreboard.add_UID(uid)
+            current_score = scoreboard.get_current_score()
+            log.info(f"Current score: {current_score}")
+            time.sleep(1)
+        
         score, time_remaining = scoreboard.add_UID("10BA617E")
         current_score = scoreboard.get_current_score()
         log.info(f"Current score: {current_score}")
