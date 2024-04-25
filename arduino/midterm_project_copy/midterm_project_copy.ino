@@ -84,14 +84,13 @@ void loop() {
     if (BT.ask_BT == Start) {
         state = true;
     }
-
+    */
+    state = true;
     if (!state)
         track.MotorWriting(0, 0);
     else
         SetState();
-        Search();
     // BTtest();  
-    */
     DetectRFID();
 }
 
@@ -159,9 +158,15 @@ void SetState() {
                     RFID_scanned = true;
                 }
 
-                if (on_node == 0 && NodeDetected(l2, l1, m0, r1, r2)) {
+                if (on_node == 0 &&
+                    NodeDetected(digitalRead(IRpin_LL),
+                                digitalRead(IRpin_L),
+                                digitalRead(IRpin_M),
+                                digitalRead(IRpin_R),
+                                digitalRead(IRpin_RR))) {
                     on_node = 1;
                 }
+
             }
 
             track.SlowDown();
@@ -187,7 +192,12 @@ void SetState() {
                     RFID_scanned = true;
                 }
 
-                if (on_node == 0 && NodeDetected(l2, l1, m0, r1, r2)) {
+                if (on_node == 0 &&
+                    NodeDetected(digitalRead(IRpin_LL),
+                                digitalRead(IRpin_L),
+                                digitalRead(IRpin_M),
+                                digitalRead(IRpin_R),
+                                digitalRead(IRpin_RR))) {
                     on_node = 1;
                 }
             }
@@ -210,7 +220,12 @@ void SetState() {
                 if (DetectRFID()) {
                     RFID_scanned = true;
                 }
-                if (on_node == 0 && NodeDetected(l2, l1, m0, r1, r2)) {
+                if (on_node == 0 &&
+                    NodeDetected(digitalRead(IRpin_LL),
+                                digitalRead(IRpin_L),
+                                digitalRead(IRpin_M),
+                                digitalRead(IRpin_R),
+                                digitalRead(IRpin_RR))) {
                     on_node = 1;
                 }
             }
@@ -235,7 +250,12 @@ void SetState() {
                 if (DetectRFID()) {
                     RFID_scanned = true;
                 }
-                if (on_node == 0 && NodeDetected(l2, l1, m0, r1, r2)) {
+                if (on_node == 0 &&
+                    NodeDetected(digitalRead(IRpin_LL),
+                                digitalRead(IRpin_L),
+                                digitalRead(IRpin_M),
+                                digitalRead(IRpin_R),
+                                digitalRead(IRpin_RR))) {
                     on_node = 1;
                 }
             }
