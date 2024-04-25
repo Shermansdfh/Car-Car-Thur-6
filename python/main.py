@@ -41,9 +41,47 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
     # point = ScoreboardFake("your team name", "data/fakeUID.csv") # for local testing
     interface = BTInterface(port=bt_port)
     # TODO : Initialize necessary variables
+    routes = [] # ["fbrl", "fbrl", "fbrl", "fbrl",]
 
     if mode == "0":
         log.info("Mode 0: For treasure-hunting")
+        
+        interface.start()
+        arduino_received_cmd = False
+        
+        while True:
+            uid = interface.ReadUID()
+            if (uid == 0):
+                continue
+            else:
+                score, time_remaining = point.add_UID(uid)
+                current_score = point.get_current_score()
+                log.info(f"Current score: {current_score}")
+                time.sleep(1)
+        
+            if (interface.get_string() == "g"):
+                arduino_received_cmd = True
+                
+            if (routes[0] == ""):
+                    routes.pop(0)
+                    
+            if (arduino_received_cmd):
+                arduino_received_cmd = False
+                if (routes[0][0] == "f"):
+                    interface.send_action("forward")
+                elif (routes[0][0] == "b"):
+                    interface.send_action("backward")
+                elif (routes[0][0] == "r"):
+                    interface.send_action("left")
+                elif (routes[0][0] == "l"):
+                    interface.send_action("right")
+                routes[0] = routes[0][1:]
+            else: continue
+            
+            msgWrite = input()
+            if msgWrite == "exit":
+                sys.exit()
+            
         # TODO : for treasure-hunting, which encourages you to hunt as many scores as possible
 
     elif mode == "1":
