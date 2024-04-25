@@ -164,10 +164,13 @@ if __name__ == "__main__":
 
         while True: 
             uid = test.ReadUID()
-            score, time_remaining = scoreboard.add_UID(uid)
-            current_score = scoreboard.get_current_score()
-            log.info(f"Current score: {current_score}")
-            time.sleep(1)
+            if (uid == 0):
+                continue
+            else:
+                score, time_remaining = scoreboard.add_UID(uid)
+                current_score = scoreboard.get_current_score()
+                log.info(f"Current score: {current_score}")
+                time.sleep(1)
         
         score, time_remaining = scoreboard.add_UID("10BA617E")
         current_score = scoreboard.get_current_score()

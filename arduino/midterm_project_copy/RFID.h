@@ -47,8 +47,8 @@ bool DetectRFID() {
         rfid(idSize);
         byte* uid = rfid(idSize);
         BT.send_byte(uid, idSize); // Send the UID over Bluetooth
-        return true
+        return true;
     }
     else 
-        return false
+        return false;
 }

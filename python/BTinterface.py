@@ -41,10 +41,11 @@ class BTInterface:
     def ReadUID(self):
         uid = self.bt.serial_read_byte()
         if uid:
-            # return uid
             print(f"UID received: {uid}")
+            return uid.removeprefix("0x")
         else:
             print("No UID received.")
+            return 0
     
     def write(self, output: str):
         # Write the byte to the output buffer, encoded by utf-8.

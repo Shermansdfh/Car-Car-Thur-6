@@ -80,6 +80,7 @@ void SetState();  // switch the state
 
 /*===========================define function===========================*/
 void loop() {
+    /*
     if (BT.ask_BT == Start) {
         state = true;
     }
@@ -90,7 +91,9 @@ void loop() {
         SetState();
         Search();
     // BTtest();  
-    }
+    */
+    DetectRFID();
+}
 
 /*void BTtest() {
     _cmd = ask_BT(); // Get command from bluetooth
@@ -130,7 +133,7 @@ void loop() {
 void SetState() {
     _cmd = BT.ask_BT(); // Get command from bluetooth
     if (RFID_scanned) {
-        _cmd = Backward;
+        // _cmd = Backward;
         RFID_scanned = false;
     }
 
@@ -219,7 +222,7 @@ void SetState() {
             Serial.println("BACKWARD");
             track.OldUTurn();
 
-            DetectedRFID();
+            DetectRFID();
 
             while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)) {
                 track.Tracking(
