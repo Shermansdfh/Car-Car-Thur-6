@@ -258,7 +258,8 @@ void UTurn3rd() {
 */
 
 void TrackClass::SlowDown() {
-    delay(500);
+    delay(150);
+    track.MotorWriting(0, 0);
 }
 
 TrackClass track = TrackClass();

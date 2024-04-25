@@ -19,8 +19,8 @@ int extern _Tp;
 
 
 
-bool on_node(bool on_node, int l2, int l1, int m0, int r1, int r2) {
-    if (on_node == 0 && l2 && l1 && m0 && r1 && r2) {
+bool NodeDetected(bool on_node, int l2, int l1, int m0, int r1, int r2) {
+    if (l2 && l1 && m0 && r1 && r2) {
         return true;
     }
     else 

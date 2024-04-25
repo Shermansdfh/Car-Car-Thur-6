@@ -41,6 +41,7 @@ class BTInterface:
     def ReadUID(self):
         uid = self.bt.serial_read_byte()
         if uid:
+            # return uid
             print(f"UID received: {uid}")
         else:
             print("No UID received.")

@@ -69,6 +69,7 @@ int l2 = 0, l1 = 0, m0 = 0, r1 = 0, r2 = 0;  // 紅外線模組的讀值(0->whit
 int _Tp = 150;                                // set your own value for motor power
 double last_error = 0.0; 
 bool state = false;     // set state to false to halt the car, set state to true to activate the car
+bool RFID_scanned = false;
 BluetoothClass::BT_CMD _cmd = BluetoothClass::NOTHING;  // enum for bluetooth message, reference in bluetooth.h line 2
 /*===========================initialize variables===========================*/
 
@@ -79,24 +80,19 @@ void SetState();  // switch the state
 
 /*===========================define function===========================*/
 void loop() {
-    if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
-        byte& idSize = mfrc522.uid.size;
-        rfid(idSize);
-        byte* uid = rfid(idSize);
-        BT.send_byte(uid, idSize); // Send the UID over Bluetooth
+    if (BT.ask_BT == Start) {
+        state = true;
     }
-    /*
+
     if (!state)
         track.MotorWriting(0, 0);
     else
+        SetState();
         Search();
     // BTtest();  
-    SetState();
-    */
-}
+    }
 
-/*
-void BTtest() {
+/*void BTtest() {
     _cmd = ask_BT(); // Get command from bluetooth
     
     switch(_cmd) {
@@ -129,108 +125,120 @@ void BTtest() {
     delay(1000);
     track.MotorWriting(0, 0);
     // 2. Change state if need
-}
-*/
+}*/
 
 void SetState() {
     _cmd = BT.ask_BT(); // Get command from bluetooth
+    if (RFID_scanned) {
+        _cmd = Backward;
+        RFID_scanned = false;
+    }
 
-    l2 = digitalRead(IRpin_LL);
-    l1 = digitalRead(IRpin_L);
-    m0 = digitalRead(IRpin_M);
-    r1 = digitalRead(IRpin_R);
-    r2 = digitalRead(IRpin_RR);
-
-    bool on_node = 0;   // 用來記錄node
+    bool on_node = 0;   // 用來記錄是否在node上
     switch(_cmd) {
-        case BluetoothClass::Forward:       
+        case BluetoothClass::Forward:
+            Serial1.write('g');  
             Serial.println("FORWARD");
-            /*
-            track.MotorWriting(_Tp, _Tp); 
-            delay(500);
-            track.MotorWriting(0, 0);
-            */
-
-            /*
-            while(!(on_node && l2 == 0 && r2 == 0)){
-                track.Tracking(l2, l1, m0, r1, r2);
-                if (on_node==0 && l2 && l1 && m0 && r1 && r2) {
-                    on_node = 1;
-                }
-            }
-            */
             
-            while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)){
-                track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));   
-                rfid(mfrc522.uid.size);
-                if (on_node==0 && digitalRead(IRpin_LL) && digitalRead(IRpin_L) && digitalRead(IRpin_M) && digitalRead(IRpin_R) && digitalRead(IRpin_RR)) {
+            while (!(on_node && 
+                    digitalRead(IRpin_LL) == 0 && 
+                    digitalRead(IRpin_RR) == 0)) {
+                
+                track.Tracking(
+                    digitalRead(IRpin_LL),
+                    digitalRead(IRpin_L),
+                    digitalRead(IRpin_M),
+                    digitalRead(IRpin_R),
+                    digitalRead(IRpin_RR)
+                );
+                
+                if (DetectRFID()) {
+                    RFID_scanned = true;
+                }
+
+                if (on_node == 0 && NodeDetected(l2, l1, m0, r1, r2)) {
                     on_node = 1;
                 }
             }
 
-            track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
-            delay(150);
-            track.MotorWriting(0,0);
-            break;
-        case BluetoothClass::Backward:
-            Serial.println("BACKWARD");
-            track.OldUTurn();
-            /*
-            track.MotorWriting(_Tp, _Tp); 
-            delay(500);
-            track.MotorWriting(0, 0);
-            */
-            while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)){
-                track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
-                rfid(mfrc522.uid.size);
-                if (on_node == 0 && digitalRead(IRpin_LL) && digitalRead(IRpin_L) && digitalRead(IRpin_M) && digitalRead(IRpin_R) && digitalRead(IRpin_RR)) {
-                    on_node = 1;
-                }
-            }
-            track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
-            delay(100);
-            track.MotorWriting(0, 0);
+            track.SlowDown();
             break;
         case BluetoothClass::RightTurn:
+            Serial1.write('g');  
             Serial.println("RIGHT");
             track.OldQuarterCircleR();
       
-             /*
-            track.MotorWriting(_Tp, _Tp); 
-            delay(500);
-            track.MotorWriting(0, 0);
-            */
-            while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)){
-                track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
-                rfid(mfrc522.uid.size);
-                if (on_node==0 && digitalRead(IRpin_LL) && digitalRead(IRpin_L) && digitalRead(IRpin_M) && digitalRead(IRpin_R) && digitalRead(IRpin_RR)) {
+            while (!(on_node && 
+                    digitalRead(IRpin_LL) == 0 && 
+                    digitalRead(IRpin_RR) == 0)) {
+                
+                track.Tracking(
+                    digitalRead(IRpin_LL),
+                    digitalRead(IRpin_L),
+                    digitalRead(IRpin_M),
+                    digitalRead(IRpin_R),
+                    digitalRead(IRpin_RR)
+                );
+                
+                if (DetectRFID()) {
+                    RFID_scanned = true;
+                }
+
+                if (on_node == 0 && NodeDetected(l2, l1, m0, r1, r2)) {
                     on_node = 1;
                 }
             }
-            track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
-            delay(150);
-            track.MotorWriting(0,0);
+
+            track.SlowDown();
             break;
         case BluetoothClass::LeftTurn:
+            Serial1.write('g');  
             Serial.println("LEFT");
             track.OldQuarterCircleL();
-             /*
-            track.MotorWriting(_Tp, _Tp); 
-            delay(500);
-            track.MotorWriting(0, 0);
-            */
-            while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)){
-                track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
-                rfid(mfrc522.uid.size);
-                if (on_node==0 && digitalRead(IRpin_LL) && digitalRead(IRpin_L) && digitalRead(IRpin_M) && digitalRead(IRpin_R) && digitalRead(IRpin_RR)) {
+
+            while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)) {
+                track.Tracking(
+                    digitalRead(IRpin_LL),
+                    digitalRead(IRpin_L),
+                    digitalRead(IRpin_M),
+                    digitalRead(IRpin_R),
+                    digitalRead(IRpin_RR)
+                );
+                if (DetectRFID()) {
+                    RFID_scanned = true;
+                }
+                if (on_node == 0 && NodeDetected(l2, l1, m0, r1, r2)) {
                     on_node = 1;
                 }
             }
-            track.Tracking(digitalRead(IRpin_LL), digitalRead(IRpin_L), digitalRead(IRpin_M), digitalRead(IRpin_R), digitalRead(IRpin_RR));
-            delay(150);
-            track.MotorWriting(0,0);
+
+            track.SlowDown();
             break;
-            
+        case BluetoothClass::Backward:
+            Serial1.write('g');  
+            Serial.println("BACKWARD");
+            track.OldUTurn();
+
+            DetectedRFID();
+
+            while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)) {
+                track.Tracking(
+                    digitalRead(IRpin_LL),
+                    digitalRead(IRpin_L),
+                    digitalRead(IRpin_M),
+                    digitalRead(IRpin_R),
+                    digitalRead(IRpin_RR)
+                );
+                if (DetectRFID()) {
+                    RFID_scanned = true;
+                }
+                if (on_node == 0 && NodeDetected(l2, l1, m0, r1, r2)) {
+                    on_node = 1;
+                }
+            }
+
+            track.SlowDown();
+            break;          
         case BluetoothClass::NOTHING:
             break;
     }
@@ -239,8 +247,3 @@ void SetState() {
     track.MotorWriting(0, 0);
     // 2. Change state if need
 }
-
-void Search() {
-    // TODO: let your car search graph(maze) according to bluetooth command from python code
-}
-/*===========================define function===========================*/
