@@ -118,7 +118,7 @@ void TrackClass::Tracking(int l2, int l1, int m0, int r1, int r2) {
 
 void TrackClass::QuarterCircleLeft() {
     TrackClass::MotorWriting(-120, 120);
-    delay(50);
+    delay(150);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(-120, 120);
     }
@@ -130,7 +130,7 @@ void TrackClass::QuarterCircleLeft() {
 
 void TrackClass::QuarterCircleRight() {
     TrackClass::MotorWriting(120, -120);
-    delay(50);
+    delay(150);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(120, -120);
     }
@@ -142,7 +142,7 @@ void TrackClass::QuarterCircleRight() {
 
 void TrackClass::UTurn() {
     TrackClass::MotorWriting(150, -150);
-    delay(50);
+    delay(150);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(150, -150);
     }
@@ -168,94 +168,94 @@ void TrackClass::OldQuarterCircleL() {
 }
 
 /*以下為轉彎函數 by鄭睿昕
-void LeftTurn3rd() {
+void TrackClass::LeftTurn3rd() {
     while(digitalRead(40) == 1 && digitalRead(32) == 1){    // 兩邊有任一偵測到白，則停止
-        MotorWriting(50, 52);   //讓車自盡量不偏右
+        TrackClass::MotorWriting(50, 52);   //讓車自盡量不偏右
     }
-    MotorWriting(50, 52);   //讓車自盡量不偏右
+    TrackClass::MotorWriting(50, 52);   //讓車自盡量不偏右
     delay(50); //往前走一小段，時間需調整
     if(digitalRead(36) == 1){   //車子在node中走得直
         while(digitalRead(36) == 1){
-            MotorWriting(-100, 100);
+            TrackClass::MotorWriting(-100, 100);
         }
         while(digitalRead(36) == 0 && digitalRead(34) == 1){
-            MotorWriting(-100, 100);
+            TrackClass::MotorWriting(-100, 100);
         }
         while(digitalRead(36) == 0 && digitalRead(34) == 0){
-            MotorWriting(-100, 100);
+            TrackClass::MotorWriting(-100, 100);
         }
     }
     else if(digitalRead(36) == 0){  //車子在node中偏左或右，或前方無道路
         if(digitalRead(40) == 1 || digitalRead(38) == 1){  //偏右
             while(digitalRead(36) == 0){
-                MotorWriting(-100, 100);
+                TrackClass::MotorWriting(-100, 100);
             }
             while(digitalRead(36) == 1){
-            MotorWriting(-100, 100);
+                TrackClass::MotorWriting(-100, 100);
             }
             while(digitalRead(36) == 0 && digitalRead(34) == 1){
-            MotorWriting(-100, 100);
+                TrackClass::MotorWriting(-100, 100);
             }
             while(digitalRead(36) == 0 && digitalRead(34) == 0){
-                MotorWriting(-100, 100);
+                TrackClass::MotorWriting(-100, 100);
             }
         }
         else{   //偏左或前方無道路
             while(digitalRead(36) == 0 && digitalRead(34) == 0){
-                MotorWriting(-100, 100);
+                TrackClass::MotorWriting(-100, 100);
             }
         }
     }
 }
 
-void RightTurn3rd() {
+void TrackClass::RightTurn3rd() {
     while(digitalRead(40) == 1 && digitalRead(32) == 1){    // 兩邊有任一偵測到白，則停止
-        MotorWriting(50, 52);   //讓車自盡量不偏右
+        TrackClass::MotorWriting(50, 52);   //讓車自盡量不偏右
     }
     MotorWriting(50, 52);   //讓車自盡量不偏右
     delay(50); //往前走一小段，時間需調整
     if(digitalRead(36) == 1){   //車子在node中走得直
         while(digitalRead(36) == 1){
-            MotorWriting(100, -100);
+            TrackClass::MotorWriting(100, -100);
         }
         while(digitalRead(36) == 0 && digitalRead(38) == 1){
-            MotorWriting(100, -100);
+            TrackClass::MotorWriting(100, -100);
         }
         while(digitalRead(36) == 0 && digitalRead(38) == 0){
-            MotorWriting(100, -100);
+            TrackClass::MotorWriting(100, -100);
         }
     }
     else if(digitalRead(36) == 0){  //車子在node中偏左或右，或前方無道路
         if(digitalRead(32) == 1 || digitalRead(34) == 1){  //偏左
             while(digitalRead(36) == 0){
-                MotorWriting(100, -100);
+                TrackClass::MotorWriting(100, -100);
             }
             while(digitalRead(36) == 1){
-            MotorWriting(100, -100);
+                TrackClass::MotorWriting(100, -100);
             }
             while(digitalRead(36) == 0 && digitalRead(38) == 1){
-            MotorWriting(100, -100);
+                TrackClass::MotorWriting(100, -100);
             }
             while(digitalRead(36) == 0 && digitalRead(38) == 0){
-                MotorWriting(100, -100);
+                TrackClass::MotorWriting(100, -100);
             }
         }
         else{   //偏右或前方無道路
             while(digitalRead(36) == 0 && digitalRead(38) == 0){
-                MotorWriting(100, -100);
+                TrackClass::MotorWriting(100, -100);
             }
         }
     }
 }
 
-void UTurn3rd() {
+void TrackClass::UTurn3rd() {
     while(digitalRead(40) == 1 && digitalRead(32) == 1){    // 兩邊有任一偵測到白，則停止
-        MotorWriting(50, 52);   //讓車自盡量不偏右
+        TrackClass::MotorWriting(50, 52);   //讓車自盡量不偏右
     }
-    MotorWriting(50, 52);   //讓車自盡量不偏右
+    TrackClass::MotorWriting(50, 52);   //讓車自盡量不偏右
     delay(50); //往前走一小段，時間需調整
     while(digitalRead(36) == 0 && digitalRead(34) == 0){
-        MotorWriting(-100, 100);    //向左迴轉
+        TrackClass::MotorWriting(-100, 100);    //向左迴轉
     }
 }
 */
