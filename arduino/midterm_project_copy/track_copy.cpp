@@ -30,6 +30,9 @@ void TrackClass::SETUP() {
 void TrackClass::MotorWriting(double vL, double vR) {
     // use TB6612 to control motor voltage & direction
     // vL, vR belongs to [-255, 255]
+    double adj_R = 1.06, adj_L = 1;
+    vL *= adj_L;
+    vR *= adj_R;
 
     if (vL >= 0) { //L forward
         analogWrite(MotorL_PWML, vL); 
@@ -99,7 +102,7 @@ void TrackClass::Tracking(int l2, int l1, int m0, int r1, int r2) {
     double vR = Tp - power_correction; 
     double vL = Tp + power_correction;
     
-    double adj_R = 1, adj_L = 1;  // 馬達轉速修正係數。MotorWriting(_Tp,_Tp)如果歪掉就要用參數修正。
+    // double adj_R = 1.055, adj_L = 1; // 馬達轉速修正係數。MotorWriting(_Tp,_Tp)如果歪掉就要用參數修正。
 
     if (vR > 255)
         vR = 255;
@@ -110,15 +113,12 @@ void TrackClass::Tracking(int l2, int l1, int m0, int r1, int r2) {
     if (vL < -255)
         vL = -255;
 
-    TrackClass::MotorWriting(adj_L * vL, adj_R * vR);
+    TrackClass::MotorWriting(vL, vR);
 }  // tracking
 
 void TrackClass::QuarterCircleLeft() {
-    // 車車會偏右，左轉檢測兩次直條
-    while (digitalRead(36) == 0) {
-        TrackClass::MotorWriting(-120, 120);
-    }
-
+    TrackClass::MotorWriting(-120, 120);
+    delay(50);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(-120, 120);
     }
@@ -129,7 +129,8 @@ void TrackClass::QuarterCircleLeft() {
 }
 
 void TrackClass::QuarterCircleRight() {
-    // 車車會偏右，右轉檢測一次直條
+    TrackClass::MotorWriting(120, -120);
+    delay(50);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(120, -120);
     }
@@ -140,6 +141,8 @@ void TrackClass::QuarterCircleRight() {
 }
 
 void TrackClass::UTurn() {
+    TrackClass::MotorWriting(150, -150);
+    delay(50);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(150, -150);
     }

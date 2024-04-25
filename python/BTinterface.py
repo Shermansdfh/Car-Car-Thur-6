@@ -104,13 +104,27 @@ class BTInterface:
 
 
 if __name__ == "__main__":
-    test = BTInterface("COM5") 
+    test = BTInterface("COM9") 
     test.start()
 
-    while True:
-        test.ReadUID()
+     # 藍芽控制測試
+    while(1):
+        comm = input("command: ")
+        if(comm == 'f'):
+            test.send_action("forward")
+        elif(comm == 'b'):
+            test.send_action("backward")
+        elif(comm == 'r'):
+            test.send_action("right")
+        elif(comm == 'l'):
+            test.send_action("left")
+        
+
+
+    # while True:
+    #     test.ReadUID()
     
-    test.end_process()
+    # test.end_process()
     
 ''' 十字地圖測試
     test.send_action("forward")
@@ -123,18 +137,7 @@ if __name__ == "__main__":
     test.send_action("right")
 '''
 
-''' 藍芽控制測試
-    while(1):
-        comm = input("command: ")
-        if(comm == 'f'):
-            test.send_action("forward")
-        elif(comm == 'b'):
-            test.send_action("backward")
-        elif(comm == 'r'):
-            test.send_action("right")
-        elif(comm == 'l'):
-            test.send_action("left")
-'''
+
 
 ''' BT control write()測試
 if __name__ == "__main__":
