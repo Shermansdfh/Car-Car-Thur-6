@@ -10,8 +10,6 @@ from BT import Bluetooth
 
 log = logging.getLogger(__name__)
 
-# hint: You may design additional functions to execute the input command, which will be helpful when debugging :)
-
 
 class BTInterface:
     def __init__(self, port: Optional[str] = None):

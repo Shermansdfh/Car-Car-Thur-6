@@ -22,8 +22,6 @@ class Action(IntEnum):
 
 
 class Maze:
-    # TODO: determine when and where to record explored dead end
-    
     def __init__(self, filepath: str):
         """
         # read csv file
@@ -36,24 +34,30 @@ class Maze:
             For real index of node, real_idx - 1 = ix = idx
         """
         
+        # TODO: merge explored dead ends dictionary with all dead ends dictionary thru tuple
         self.raw_data = pandas.read_csv(filepath).values # read csv file into a numpy array
+        self.total_node_count = self.raw_data.shape[0] # actual total number of nodes (starting from 1)
         self.nodes = [] 
-        self.node_dict = dict()  # key: index, value: the correspond node
-        self.explored_dead_end_dict = dict()
+        self.node_dict = {}  # key: index, value: (corresponding node, is_dead_end?(bool), explored_dead_end?(bool))
+        self.explored_dead_end_dict = {}
         
-        rows = self.raw_data.shape[0]
+        rows = self.total_node_count 
         cols = 5 # index, North, South, West, East
         
+        # Initialize nd_list and nd_dict.
         for ix in range(rows): 
             index = int(self.raw_data[ix, 0])
             node = Node(index)
             self.nodes.append(node)
-            self.node_dict[index] = node # add to nd_dict by {key(index): value(corresponding node)}
+            
+            # Add tuple to nd_dict by {key(index): value((corresponding node), dead end?(bool), False(not explored dead end))}
+            self.node_dict[index] = (node, node.is_dead_end(), False) 
         
+        # Initialize adjacency list with successors
         for ix in range(rows):    
             for iy in range(1, cols): # iy stands for NORTH = 1, SOUTH = 2. WEST = 3, EAST = 4
                 
-                # make NaN = 0
+                # Make NaN read = 0
                 if self.raw_data[ix,iy] == self.raw_data[ix,iy]:
                     cell_read = int(self.raw_data[ix,iy])
                 else:
@@ -69,9 +73,46 @@ class Maze:
             return 0
         return self.node_dict[1]
 
+    def get_node_number(self):
+        return self.total_node_count
+
     def get_node_dict(self):
         return self.node_dict
     
+    def find_maze_height(self):
+        visited = set()
+        min_height = float('inf')
+        max_height = float('-inf')
+        
+        def DFS(node: Node, height: int):
+            nonlocal min_height, max_height
+            
+            if node in visited:
+                return
+            
+            visited.add(node)
+            min_height = min(min_height, height)
+            max_height = max(max_height, height)
+            
+            succ = node.get_successors()
+            neighbors = [i[0] for i in succ]
+            directions = [i[1] for i in succ]
+                
+            if Direction.NORTH in directions:
+                DFS(neighbors[directions.index(Direction.NORTH)], height - 1)
+            if Direction.SOUTH in directions:
+                DFS(neighbors[directions.index(Direction.SOUTH)], height + 1)
+            if Direction.WEST in directions:
+                DFS(neighbors[directions.index(Direction.WEST)], height)
+            if Direction.EAST in directions:
+                DFS(neighbors[directions.index(Direction.EAST)], height)
+        
+        DFS(self.get_start_point()[0], 1)
+        
+        maze_height = max_height - min_height + 1
+        
+        return maze_height                
+        
     def backtrace(self, parent: Node, node_from: Node, node_to: Node):
         """ tracks path by finding parents till the start node
             
@@ -169,27 +210,45 @@ class Maze:
                     visited.add(succ_node)
                     # dis[succ_node] = dis[now_node] + 1
 
-    def ManhattanDistance(self, node_from: Node, node_to: Node, maze_height: int):
-        """ Calculate Manhattan distance between two nodes.
+    def AllManhattanDistance(self, node_marked: Node):
+        """ Calculate Manhattan distance between a node and all other nodes.
 
         Args:
-            node_from (Node): The current node.
-            node_to (Node): The node to move to.
+            node_marked (Node): The node we want to calculate the Manhattan distance for.
 
         Returns:
-            int: The Manhattan distance between the two nodes.
+            list: A list of all Manhattan distances with respect to the given node.
         """
         
-        node_from_idx = node_from.get_index()
-        node_to_idx = node_to.get_index()
-        
-        x1 = node_from_idx / maze_height + 1
-        x2 = node_to_idx / maze_height + 1
-        y1 = node_from_idx - maze_height * (x1 - 1)
-        y2 = node_to_idx - maze_height * (x2 - 1)
-        
-        return abs(x1 - x2) + abs(y1 - y2)
+        def ManhattanDistance(self, node_from: Node, node_to: Node):
+            """ Calculate Manhattan distance between two nodes.
 
+            Args:
+                node_from (Node): The current node.
+                node_to (Node): The node to move to.
+
+            Returns:
+                int: The Manhattan distance between the two nodes.
+            """
+            
+            maze_height = self.find_maze_height()
+            
+            node_from_idx = node_from.get_index()
+            node_to_idx = node_to.get_index()
+            
+            x1 = (node_from_idx - 1) // maze_height + 1
+            y1 = (node_from_idx - 1) % maze_height + 1
+            x2 = (node_to_idx - 1) // maze_height + 1
+            y2 = (node_to_idx - 1) % maze_height + 1
+            
+            return abs(x1 - x2) + abs(y1 - y2)
+        
+        manhattan_distance_dict = {}
+        for i in range(self.total_node_count):
+            idx = i + 1
+            manhattan_distance_dict[idx] = ManhattanDistance(node_marked, self.nodes[idx - 1])
+        return manhattan_distance_dict
+            
     def getAction(self, car_dir, node_from: Node, node_to: Node):
         """ Get the action required to move from node_from to node_to, given the current car direction.
 
@@ -274,11 +333,26 @@ class Maze:
         log.info(cmds)
         return cmds
 
+    def DeadEndExplored(self, explored_node: Node):
+        """ Changes the explored_dead_end attribute in nd_dict to True if the given node is a dead end and is explored.
+
+        Args:
+            explored_node (Node): The node detected
+        """
+        
+        idx = explored_node.get_index()
+        if (explored_node.is_dead_end()):
+            node_obj, is_dead_end, _ = self.node_dict[idx]
+            self.node_dict[idx] = (node_obj, is_dead_end, True)
+        else:
+            log.error("Error: The node is not a dead end.")
+        return
+        
     def strategy(self, node: Node):
         return self.BFS(node)
 
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
 
-maze = Maze(r"C:\Users\88696\Downloads\maze_0418.csv") # May plug ones filepath of maze into ""
+maze = Maze(r"C:\Users\88696\Downloads\big_maze_112.csv") # May plug ones filepath of maze into ""
 print(maze.actions_to_str(maze.getActions(maze.strategy_2(Node(3), Node(46)))))
