@@ -2,7 +2,7 @@ import csv
 import logging
 import math
 from enum import IntEnum
-from typing import List
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas 
@@ -22,52 +22,43 @@ class Action(IntEnum):
 
 
 class Maze:
+    """ Class to represent a data structure for nodes and their successors.
+
+        Args:
+            filepath (str): The path to the CSV file containing node data.
+    """
     def __init__(self, filepath: str):
-        """
-        # read csv file
-        # every node records all its successor
-        # store these objects into self.nodes.
-        # add to nd_dict by {key(index): value(corresponding node)}
-        
-        Note:
-            For idx of self.nodes, ix = idx
-            For real index of node, real_idx - 1 = ix = idx
+        """ Initializes the node data structure.
+
+            Args:
+                filepath (str): The path to the CSV file containing node data.
         """
         
-        self.raw_data = pandas.read_csv(filepath).values # read csv file into a numpy array
-        self.total_node_count = self.raw_data.shape[0] # actual total number of nodes (starting from 1)
-        self.nodes = [] 
-        self.node_dict = {}  # key: index, value: (corresponding node, is_dead_end?(bool), explored_dead_end?(bool))
+        self.raw_data = pandas.read_csv(filepath).values # Read CSV file into a numpy array
+        self.total_node_count = self.raw_data.shape[0] # Total number of nodes (starting from 1)
+        self.node_dict = {}  # key: index, value: (node, is_dead_end?(bool), explored_dead_end?(bool))
         
-        rows = self.total_node_count 
-        cols = 5 # index, North, South, West, East
-        
-        # Initialize nd_list and nd_dict.
-        for ix in range(rows): 
+        # Initialize node_dict.
+        for ix in range(self.total_node_count): 
             index = int(self.raw_data[ix, 0])
             node = Node(index)
-            self.nodes.append(node)
-            
-            # Add tuple to nd_dict by {key(index): value((corresponding node), dead end?(bool), False(not explored dead end))}
-            self.node_dict[index] = (node, False, False) 
+            self.node_dict[index] = (node, False, False) # (Node, is_dead_end?, explored_dead_end?)
+        
         
         # Initialize adjacency list with successors
-        for ix in range(rows):    
-            for iy in range(1, cols): # iy stands for NORTH = 1, SOUTH = 2. WEST = 3, EAST = 4
-                
-                # Make NaN read = 0
-                if self.raw_data[ix,iy] == self.raw_data[ix,iy]:
-                    cell_read = int(self.raw_data[ix,iy])
-                else:
-                    cell_read = 0
-                
+        for ix in range(self.total_node_count):    
+            for iy in range(1, 5): # index = 0, North = 1, South = 2, West = 3, East = 4
+                cell_read = int(self.raw_data[ix, iy]) if not pandas.isna(self.raw_data[ix, iy]) else 0
                 idx = ix + 1
-                # adjacency list
-                if (cell_read): # if cell_read isn't empty (i.e. NaN) 
+                
+                # Adjacency list
+                if (cell_read): # If cell_read isn't empty (i.e., NaN)
                     self.node_dict[idx][0].set_successor(self.node_dict[cell_read][0], iy)        
 
-        for i in range(rows):
-            self.node_dict[i + 1] = self.node_dict[i + 1][0],self.node_dict[i + 1][0].is_dead_end(),self.node_dict[i + 1][2]
+        for idx in range(1, self.total_node_count + 1):
+            self.node_dict[idx] = (self.node_dict[idx][0],
+                                   self.node_dict[idx][0].is_dead_end(),
+                                   self.node_dict[idx][2])
         
     def get_start_point(self):
         if len(self.node_dict) < 2:
@@ -84,7 +75,12 @@ class Maze:
     def get_node_dict(self):
         return self.node_dict
     
-    def find_maze_height(self):
+    def find_maze_height(self) -> int:
+        """ Finds the height of the maze.
+
+        Returns:
+            int: The height of the maze.
+        """
         visited = set()
         min_height = float('inf')
         max_height = float('-inf')
@@ -118,8 +114,8 @@ class Maze:
         
         return maze_height                
         
-    def backtrace(self, parent: Node, node_from: Node, node_to: Node):
-        """ tracks path by finding parents till the start node
+    def backtrace(self, parent_map: Dict[int, Node], node_from: Node, node_to: Node) -> List[Node]:
+        """ Tracks path by finding parents till the start node
             
         Args:
             parent (Node): a dictionary that records every node's parent
@@ -130,12 +126,10 @@ class Maze:
             List[Node]: A list of nodes that tracks the path.
         """
         
-        # print("backtrace called")
-        
         path = [node_to]
         while path[-1] != node_from:
             idx = path[-1].get_index()
-            path.append(parent[idx])
+            path.append(parent_map[idx])
             
         path.reverse()
         return path
@@ -166,7 +160,7 @@ class Maze:
                 & (now_idx != node.get_index()) 
                 & (self.get_node_dict()[now_idx][2])
             ): # found
-                self.DeadEndExplored()
+                self.mark_dead_end_explored()
                 return self.backtrace(parent, node, self.get_node(now_idx))
 
             successors = self.get_node(now_idx).get_successors()
@@ -180,7 +174,6 @@ class Maze:
 
     def BFS_2(self, node_from: Node, node_to: Node):
         """ BFS with fixed start point and end point
-            If distance is needed, write another function for it
 
         Args:
             node_from (Node): The current node.
@@ -214,7 +207,6 @@ class Maze:
 
     def BFS_2_distance(self, node_from: Node, node_to: Node):
         """ BFS with fixed start point and end point
-            If distance is needed, write another function for it
 
         Args:
             node_from (Node): The current node.
@@ -236,7 +228,6 @@ class Maze:
             
             if now_idx == node_to.get_index(): # found
                 return dis[now_node]
-                return self.backtrace(parent, node_from, node_to)
 
             successors = self.get_node(now_idx).get_successors()
             
@@ -286,7 +277,7 @@ class Maze:
             manhattan_distance_dict[idx] = self.ManhattanDistance(node_marked, self.get_node(idx))
         return manhattan_distance_dict
             
-    def getAction(self, car_dir, node_from: Node, node_to: Node):
+    def get_action(self, car_dir, node_from: Node, node_to: Node) -> Tuple[Action, Direction]:
         """ Get the action required to move from node_from to node_to, given the current car direction.
 
         Args:
@@ -326,9 +317,9 @@ class Maze:
              
         else: 
             log.error(f"Error: Node {node_from_idx} is not adjacent to Node {node_to_idx}.") 
-            return 0
+            return None
         
-    def getActions(self, nodes: List[Node]):
+    def get_actions(self, nodes: List[Node]):
         """ Given a sequence of nodes, return the corresponding action sequence.
 
         Args:
@@ -341,7 +332,7 @@ class Maze:
         now_direction = self.get_node(nodes[0].get_index()).get_direction(self.get_node(nodes[1].get_index())) # initial direction
         actions = []
         for i in range(len(nodes) - 1):
-            action, now_direction = self.getAction(now_direction, nodes[i], nodes[i + 1])
+            action, now_direction = self.get_action(now_direction, nodes[i], nodes[i + 1])
             if action is not None:
                 actions.append(action)
             else:
@@ -370,34 +361,36 @@ class Maze:
         log.info(cmds)
         return cmds
 
-    def DeadEndExplored(self, explored_node: Node):
-        """ Changes the explored_dead_end attribute in nd_dict to True if the given node is a dead end and is explored.
+    def mark_dead_end_explored(self, explored_node: Node):
+        """ Changes the explored_dead_end attribute in node_dict to True if the given node is a dead end and is explored.
 
         Args:
-            explored_node (Node): The node detected
+            explored_node (Node): The node detected.
         """
-        
         idx = explored_node.get_index()
-        if (explored_node.is_dead_end()):
+        if explored_node.is_dead_end():
             node_obj, is_dead_end, _ = self.node_dict[idx]
             self.node_dict[idx] = (node_obj, is_dead_end, True)
         else:
             log.error("Error: The node is not a dead end.")
-        return
         
     def strategy(self, node: Node):
         return self.BFS(node)
 
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
+
 if __name__ == "__main__":
-    maze = Maze(r"C:\Users\88696\Downloads\big_maze_112.csv") # May plug ones filepath of maze into ""
-    # print(maze.actions_to_str(maze.getActions(maze.strategy_2(Node(6), Node(43)))))
-    # print((maze.BFS_2_distance(Node(6), Node(43))))
+    maze = Maze(r"D:\NTU\車車課\Car-Car-Thur-6\python\data\big_maze_112.csv") # May plug ones filepath of maze into ""
+    print(maze.actions_to_str(maze.get_actions(maze.strategy_2(Node(3), Node(48)))))
+    print((maze.BFS_2_distance(Node(6), Node(43))))
     print(maze.AllManhattanDistance(Node(6)))
     print
     '''node_num = maze.get_node_number()
     node_dict = maze.get_node_dict()
     for i in node_dict.keys():    
         print(i)'''
-    
+    '''if self.raw_data[ix,iy] == self.raw_data[ix,iy]:
+                    cell_read = int(self.raw_data[ix,iy])
+                else:
+                    cell_read = 0'''
