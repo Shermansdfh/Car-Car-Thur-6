@@ -49,7 +49,7 @@ class Maze:
             self.nodes.append(node)
             
             # Add tuple to nd_dict by {key(index): value((corresponding node), dead end?(bool), False(not explored dead end))}
-            self.node_dict[index] = (node, node.is_dead_end(), False) 
+            self.node_dict[index] = (node, False, False) 
         
         # Initialize adjacency list with successors
         for ix in range(rows):    
@@ -66,6 +66,9 @@ class Maze:
                 if (cell_read): # if cell_read isn't empty (i.e. NaN) 
                     self.node_dict[idx][0].set_successor(self.node_dict[cell_read][0], iy)        
 
+        for i in range(rows):
+            self.node_dict[i + 1] = self.node_dict[i + 1][0],self.node_dict[i + 1][0].is_dead_end(),self.node_dict[i + 1][2]
+        
     def get_start_point(self):
         if len(self.node_dict) < 2:
             log.error("Error: the start point is not included.")
@@ -127,7 +130,7 @@ class Maze:
             List[Node]: A list of nodes that tracks the path.
         """
         
-        print("backtrace called")
+        # print("backtrace called")
         
         path = [node_to]
         while path[-1] != node_from:
@@ -191,7 +194,6 @@ class Maze:
         queue = [node_from] # push start node into queue
         visited = set()
         visited.add(node_from)
-        # dis = {node_from: 0} 
         
         # BFS
         while queue:
@@ -199,7 +201,6 @@ class Maze:
             now_idx = now_node.get_index()
             
             if now_idx == node_to.get_index(): # found
-                # return dis[now_node]
                 return self.backtrace(parent, node_from, node_to)
 
             successors = self.get_node(now_idx).get_successors()
@@ -210,19 +211,43 @@ class Maze:
                     parent[succ_node.get_index()] = now_node
                     queue.append(succ_node)
                     visited.add(succ_node)
-                    # dis[succ_node] = dis[now_node] + 1
 
-    def AllManhattanDistance(self, node_marked: Node):
-        """ Calculate Manhattan distance between a node and all other nodes.
+    def BFS_2_distance(self, node_from: Node, node_to: Node):
+        """ BFS with fixed start point and end point
+            If distance is needed, write another function for it
 
         Args:
-            node_marked (Node): The node we want to calculate the Manhattan distance for.
+            node_from (Node): The current node.
+            node_to (Node): The node to move to.
 
         Returns:
-            list: A list of all Manhattan distances with respect to the given node.
+            List[Node]: A list of nodes of the shortest path.
         """
         
-        def ManhattanDistance(self, node_from: Node, node_to: Node):
+        queue = [node_from] # push start node into queue
+        visited = set()
+        visited.add(node_from)
+        dis = {node_from: 0} 
+        
+        # BFS
+        while queue:
+            now_node = queue.pop(0) # get the first node in the queue
+            now_idx = now_node.get_index()
+            
+            if now_idx == node_to.get_index(): # found
+                return dis[now_node]
+                return self.backtrace(parent, node_from, node_to)
+
+            successors = self.get_node(now_idx).get_successors()
+            
+            for succ in successors:
+                succ_node, _, _ = succ
+                if succ_node not in visited:
+                    queue.append(succ_node)
+                    visited.add(succ_node)
+                    dis[succ_node] = dis[now_node] + 1
+
+    def ManhattanDistance(self, node_from: Node, node_to: Node):
             """ Calculate Manhattan distance between two nodes.
 
             Args:
@@ -244,11 +269,21 @@ class Maze:
             y2 = (node_to_idx - 1) % maze_height + 1
             
             return abs(x1 - x2) + abs(y1 - y2)
-        
+
+    def AllManhattanDistance(self, node_marked: Node):
+        """ Calculate Manhattan distance between a node and all other nodes.
+
+        Args:
+            node_marked (Node): The node we want to calculate the Manhattan distance for.
+
+        Returns:
+            list: A list of all Manhattan distances with respect to the given node.
+        """
+                     
         manhattan_distance_dict = {}
         for i in range(self.total_node_count):
             idx = i + 1
-            manhattan_distance_dict[idx] = ManhattanDistance(node_marked, self.nodes[idx - 1])
+            manhattan_distance_dict[idx] = self.ManhattanDistance(node_marked, self.get_node(idx))
         return manhattan_distance_dict
             
     def getAction(self, car_dir, node_from: Node, node_to: Node):
@@ -355,6 +390,14 @@ class Maze:
 
     def strategy_2(self, node_from: Node, node_to: Node):
         return self.BFS_2(node_from, node_to)
-
-maze = Maze(r"c:\Users\rexch\Downloads\maze (1).csv") # May plug ones filepath of maze into ""
-print(maze.actions_to_str(maze.getActions(maze.strategy_2(Node(3), Node(48)))))
+if __name__ == "__main__":
+    maze = Maze(r"C:\Users\88696\Downloads\big_maze_112.csv") # May plug ones filepath of maze into ""
+    # print(maze.actions_to_str(maze.getActions(maze.strategy_2(Node(6), Node(43)))))
+    # print((maze.BFS_2_distance(Node(6), Node(43))))
+    print(maze.AllManhattanDistance(Node(6)))
+    print
+    '''node_num = maze.get_node_number()
+    node_dict = maze.get_node_dict()
+    for i in node_dict.keys():    
+        print(i)'''
+    
