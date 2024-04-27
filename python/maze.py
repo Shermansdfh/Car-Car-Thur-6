@@ -381,9 +381,9 @@ class Maze:
         return self.BFS_2(node_from, node_to)
 
 if __name__ == "__main__":
-    maze = Maze(r"D:\NTU\車車課\Car-Car-Thur-6\python\data\big_maze_112.csv") # May plug ones filepath of maze into ""
-    print(maze.actions_to_str(maze.get_actions(maze.strategy_2(Node(3), Node(48)))))
-    print((maze.BFS_2_distance(Node(6), Node(43))))
+    maze = Maze(r"D:\NTU\車車課\Car-Car-Thur-6\python\data\medium_maze.csv") # May plug ones filepath of maze into ""
+    print(maze.actions_to_str(maze.get_actions(maze.strategy_2(Node(1), Node(12)))))
+    print((maze.BFS_2_distance(Node(6), Node(12))))
     print(maze.AllManhattanDistance(Node(6)))
     print
     '''node_num = maze.get_node_number()
