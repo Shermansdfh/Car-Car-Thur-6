@@ -7,7 +7,7 @@
 
 #include "bluetooth_copy.h"
 #include <Arduino.h>
-
+#define DEBUG
 const int rxPIN = 19;
 const int txPIN = 18;
 
@@ -52,26 +52,24 @@ BluetoothClass::BT_CMD BluetoothClass::ask_BT() {
 // can use send_byte alternatively to send msg back
 // (but need to convert to byte type)
 void BluetoothClass::send_msg(const char& msg) {
-    // Serial1.write(msg);
+    Serial1.write(msg);
+    Serial1.write('\n');
 }
 
 // send UID back through Serial1(bluetooth serial)
 void BluetoothClass::send_byte(byte* id, byte& idSize) {
     Serial.print("send_byte called!\n");
-    
+    Serial1.write("%%%");
     for (byte i = 0; i < idSize; i++) {
-        // Send UID consequently.
-        if (id[i] < 10) {
-            Serial1.write(0);
-        }
         Serial1.write(id[i]);
     }
+    Serial1.write("$$$");
 
 #ifdef DEBUG
     Serial.print("Sent id: ");
     for (byte i = 0; i < idSize; i++) {
         // Show UID consequently.
-        if (id[i] < 10) {
+        if (id[i] < 16) {
             Serial.print(0);
         }
         Serial.print(id[i], HEX);
