@@ -42,10 +42,20 @@ class Bluetooth:
     def serial_read_string(self):
         waiting = self.serial.in_waiting
         if waiting >= 0:
-            rv = self.serial.readline().decode("utf-8")[:-1]
+            try:
+                rv = self.serial.readline().decode("utf-8")[:-1]
+                return rv
+            except UnicodeDecodeError:
+                return ""
+        return ""
+    
+    def serial_read_string_with_bytes_expectation(self, num_bytes):
+        waiting = self.serial.in_waiting
+        if waiting >= num_bytes:
+            rv = self.serial.read(num_bytes).decode("utf-8")
             return rv
         return ""
-
+    
     def serial_read_byte(self):
         sleep(0.05)
         waiting = self.serial.in_waiting
