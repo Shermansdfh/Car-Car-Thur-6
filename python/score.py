@@ -161,12 +161,16 @@ if __name__ == "__main__":
         scoreboard = ScoreboardServer("Thur-6", "http://140.112.175.18:5000")
         # scoreboard = ScoreboardFake("TeamName", "data/fakeUID.csv")
         time.sleep(1)
-
-        while True: 
-            uid = test.ReadUID()
-            if (uid == 0):
-                continue
-            else:
+        while True:
+            uid = None
+            # Supposed uid: 0x%%%uid$$$
+            temp_uid = test.get_UID()
+            if temp_uid:
+                uid = temp_uid
+                uid = uid[8:-6] # Strip 0x%%% and $$$
+                uid = uid.upper()
+                print(f"UID received: {uid}")
+            if uid:
                 score, time_remaining = scoreboard.add_UID(uid)
                 current_score = scoreboard.get_current_score()
                 log.info(f"Current score: {current_score}")

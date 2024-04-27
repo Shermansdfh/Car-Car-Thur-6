@@ -32,27 +32,29 @@ class BTInterface:
         self.bt.serial_write_string("s")
         return
 
+    def get_char(self):
+        return self.bt.serial_read_byte()
+    
     def get_UID(self):
         return self.bt.serial_read_byte()
     
-    def get_string(self):
-        return self.bt.serial_read_string()
-    
-    def ReadUID(self):
-        uid = self.bt.serial_read_byte()
-        if uid:
-            print(f"UID received: {uid}")
-            return uid.removeprefix("0x")
+    def g_cmd_gotten_by_python(self):
+        temp = self.bt.serial.read(2).decode() # read(2): 'g' & '\n
+        print(f"FUNCTION: BTinterface g_cmd_gotten_by_python read in: {temp}")
+        if "g" in temp:
+            return True
         else:
-            print("No UID received.")
-            return 0
+            return False
+    
+    def get_string_old(self):
+        return self.bt.serial_read_string()
     
     def write(self, output: str):
         # Write the byte to the output buffer, encoded by utf-8.
         self.bt.serial.write(output)
         return
     
-    def send_action_through_enum(self, action: Action):
+    def send_action_to_car_through_enum(self, action: Action):
     # Send the action to the car
         if action == Action.ADVANCE:
             self.bt.serial_write_string("f")
@@ -78,8 +80,7 @@ class BTInterface:
             log.warning(f"Invalid action: {action}")
         return
     
-    def send_action(self, dir):
-    # send the action to car
+    def send_action_to_car(self, dir):
         if dir == "forward":
             self.bt.serial_write_string("f")
             print("f")
@@ -106,51 +107,48 @@ class BTInterface:
 
 
 if __name__ == "__main__":
-    test = BTInterface("COM9") 
+    test = BTInterface("COM5") 
+    test.start()
+
+    while True:
+        if test.g_cmd_gotten_by_python():
+            arduino_received_cmd = True
+            print("Arduino received cmd!")
+
+        else:
+            # Supposed uid: 0x%%%uid$$$, two % eaten by g_cmd_gotten_by_python, string left 0x%uid$$$
+            temp_uid = test.get_UID()
+            if temp_uid:
+                uid = temp_uid
+                uid = uid[4:-6] # Strip 0x%% and $$$
+                uid = uid.upper() # Make uid upper case for server recognition
+                print(f"UID received: {uid}")
+                
+    test.end_process()
+
+''' 藍芽控制測試    
     while(1):
         comm = input("command: ")
         if(comm == 'f'):
-            test.send_action("forward")
+            test.send_action_to_car("forward")
         elif(comm == 'b'):
-            test.send_action("backward")
+            test.send_action_to_car("backward")
         elif(comm == 'r'):
-            test.send_action("right")
+            test.send_action_to_car("right")
         elif(comm == 'l'):
-            test.send_action("left")
-'''    test.start()
-
-     # 藍芽控制測試
-    while(1):
-        comm = input("command: ")
-        if(comm == 'f'):
-            test.send_action("forward")
-        elif(comm == 'b'):
-            test.send_action("backward")
-        elif(comm == 'r'):
-            test.send_action("right")
-        elif(comm == 'l'):
-            test.send_action("left")
-        
-
-
-    # while True:
-    #     test.ReadUID()
+            test.send_action_to_car("left")'''
     
-    test.end_process()'''
-    
+
 ''' 十字地圖測試
-    test.send_action("forward")
-    test.send_action("right")
-    test.send_action("backward")
-    test.send_action("right")
-    test.send_action("backward")
-    test.send_action("right")
-    test.send_action("backward")
-    test.send_action("right")
+    test.send_action_to_car("forward")
+    test.send_action_to_car("right")
+    test.send_action_to_car("backward")
+    test.send_action_to_car("right")
+    test.send_action_to_car("backward")
+    test.send_action_to_car("right")
+    test.send_action_to_car("backward")
+    test.send_action_to_car("right")
 '''
-
-# 藍芽控制測試
-    
 
 ''' BT control write()測試
 if __name__ == "__main__":
