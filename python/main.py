@@ -4,6 +4,8 @@ import os
 import sys
 import time
 
+import re
+
 import numpy as np
 import pandas
 
@@ -37,11 +39,10 @@ def parse_args():
 
 def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: str):
     # maze = Maze(r"C:\Users\88696\Downloads\medium_maze.csv")
-    point = ScoreboardServer(team_name, server_url)
     # point = ScoreboardFake("your team name", "data/fakeUID.csv") # for local testing
+    point = ScoreboardServer(team_name, server_url)
     interface = BTInterface(port=bt_port)
-    routes = ["flb", "fb", "flb"] # ["fbrl", "fbrl", "fbrl", "fbrl",]
-    # TODO : Initialize necessary variables
+    routes = ["flb", "fb"]
 
     if mode == "0":
         log.info("Mode 0: For treasure-hunting")
@@ -52,27 +53,38 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
         while True:
             if interface.g_cmd_gotten_by_python():
                 arduino_received_cmd = True
-                print("Arduino received cmd!")
+                log.info("Arduino received cmd!")
 
             else:
                 # Supposed uid: 0x%%%uid$$$, two % eaten by g_cmd_gotten_by_python, string left 0x%uid$$$
                 temp_uid = interface.get_UID()
                 if temp_uid:
-                    uid = temp_uid
-                    print(f"UID before strip: {uid}")
-                    uid = uid[4:-6] # Strip 0x% and $$$
-                    uid = uid.upper() # Make uid upper case for server recognition
-                    print(f"UID received: {uid}")
- 
-                if uid:
-                    print("sth in uid")
-                    score, time_remaining = point.add_UID(uid)
-                    current_score = point.get_current_score()
-                    log.info(f"Current score: {current_score}")
-                    time.sleep(1)
+                    if "670a" in temp_uid:
+                        arduino_received_cmd = True
+                        log.info(f"UID with g\n in it: {uid}")
+                        log.info(f"Arduino received cmd!")
+                    else:
+                        uid = temp_uid
+                        log.info(f"UID before strip: {uid}")
+                        # uid = uid[4:-6] # Strip 0x% and $$$
+                        uid = re.sub(r'^0x25*', '', uid) # Strip 0x and whatever number of "25" sticking with it
+                        uid = re.sub(r'^0x25*', '', uid)
+                        uid = uid[:-6] # Strip $$$
+                        uid = uid.upper() # Make uid upper case for server recognition
+                        log.info(f"UID received: {uid}")
+    
+                        score, time_remaining = point.add_UID(uid)
+                        current_score = point.get_current_score()
+                        log.info(f"Current score: {current_score}")
+                        time.sleep(1)
             
             if (routes[0] == ""):
                 routes.pop(0)
+            
+            if not routes:
+                interface.send_action_to_car("halt")
+                log.info(f"Routes empty, halting")
+                sys.exit(1)
             
             if (arduino_received_cmd):
                 arduino_received_cmd = False
@@ -86,13 +98,14 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
                     interface.send_action_to_car("right")
                 routes[0] = routes[0][1:]
             else: 
-                print("Arduino didn't receive cmd")
+                log.info(f"Arduino didn't receive cmd")
                 continue
+            
+            log.info(f"Routes left: {routes}")
+                
             
     elif mode == "1":
         log.info("Mode 1: Self-testing mode.")
-        # TODO: You can write your code to test specific function.
-
     else:
         log.error("Invalid mode")
         sys.exit(1)
