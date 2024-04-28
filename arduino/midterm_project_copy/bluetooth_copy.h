@@ -16,7 +16,7 @@ class BluetoothClass {
     public:
 		BluetoothClass();
 		void SETUP();
-		enum BT_CMD { NOTHING, Forward, Backward, RightTurn, LeftTurn, Start, EndProcess };
+		enum BT_CMD { NOTHING, Forward, Backward, RightTurn, LeftTurn, Start, EndProcess, Halt };
 		BT_CMD ask_BT();
 		void send_msg(const char& msg);
 		void send_byte(byte* id, byte& idSize);
