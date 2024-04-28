@@ -61,7 +61,7 @@ void setup() {
 
 /*===========================initialize variables===========================*/
 int l2 = 0, l1 = 0, m0 = 0, r1 = 0, r2 = 0;  // 紅外線模組的讀值(0->white,1->black)
-int _Tp = 150;                                // set your own value for motor power
+int _Tp = 180;                                // set your own value for motor power
 double last_error = 0.0; 
 bool state = false;     // set state to false to halt the car, set state to true to activate the car
 bool RFID_scanned = false;
@@ -72,20 +72,21 @@ BluetoothClass::BT_CMD _cmd = BluetoothClass::NOTHING;  // enum for bluetooth me
 void SetState();  // switch the state
 /*===========================declare function prototypes===========================*/
 
-/*===========================define function===========================*/
 void loop() {
+    // TODO: Make all the moves in each state a function
     if (!state) {
         track.MotorWriting(0, 0);
         if (BT.ask_BT() == BluetoothClass::Start) {
             state = true;
             Serial.print("Start cmd received!\n");
+            track.MotorWriting(_Tp,_Tp);
+            delay(500);
             BT.send_msg('g');
         }
     }
     else {
         SetState();
-        // TODO: rfid early u turn
-    }
+    }   
 }
 
 void SetState() {
@@ -113,8 +114,10 @@ void SetState() {
                 
                 if (DetectRFID()) {
                     RFID_scanned = true;
-                    //BT.ask_BT(); // Clean cmd
-                    //goto back;
+
+                    BT.ask_BT(); // Clean cmd
+                    delay(100);
+                    goto back;
                 }
 
                 if (on_node == 0 &&
@@ -128,7 +131,7 @@ void SetState() {
 
             }
 
-            track.MotorWriting(_Tp, _Tp);
+            track.MotorWriting(115, 130);
             track.SlowDown();
             break;
         case BluetoothClass::RightTurn:
@@ -150,8 +153,10 @@ void SetState() {
                 
                 if (DetectRFID()) {
                     RFID_scanned = true;
-                    //BT.ask_BT(); // Clean cmd
-                    //goto back;
+
+                    BT.ask_BT(); // Clean cmd
+                    delay(100);
+                    goto back;
                 }
 
                 if (on_node == 0 &&
@@ -164,7 +169,7 @@ void SetState() {
                 }
             }
 
-            track.MotorWriting(_Tp, _Tp);
+            track.MotorWriting(115, 130);
             track.SlowDown();
             break;
         case BluetoothClass::LeftTurn:
@@ -182,8 +187,10 @@ void SetState() {
                 );
                 if (DetectRFID()) {
                     RFID_scanned = true;
-                    //BT.ask_BT(); // Clean cmd
-                    //goto back;
+
+                    BT.ask_BT(); // Clean cmd
+                    delay(100);
+                    goto back;
                 }
                 if (on_node == 0 &&
                     NodeDetected(digitalRead(IRpin_LL),
@@ -195,7 +202,7 @@ void SetState() {
                 }
             }
 
-            track.MotorWriting(_Tp, _Tp);
+            track.MotorWriting(115, 130);
             track.SlowDown();
             break;
 
@@ -221,14 +228,19 @@ void SetState() {
                 if (on_node == 0 &&
                     NodeDetected(digitalRead(IRpin_LL),
                                 digitalRead(IRpin_L),
-                                digitalRead(IRpin_M),
+                                digitalRead(IRpin_M),   
                                 digitalRead(IRpin_R),
                                 digitalRead(IRpin_RR))) {
                     on_node = 1;
                 }
             }
-            track.MotorWriting(_Tp, _Tp);
+
+            track.MotorWriting(115, 130);
             track.SlowDown();
+            break;          
+        case BluetoothClass::Halt:
+            track.MotorWriting(0, 0);
+            state = false;
             break;          
         case BluetoothClass::NOTHING:
             break;

@@ -72,6 +72,7 @@ void TrackClass::MotorCheck() {
 // Handle negative motor_PWMR value.
 void TrackClass::MotorInverter(int motor, bool& dir) {
     // Hint: the value of motor_PWMR must between 0~255, cannot write negative value.
+
 }
 
 // P/PID control Tracking
@@ -79,7 +80,7 @@ void TrackClass::Tracking(int l2, int l1, int m0, int r1, int r2) {
 
     // PD control parameters 
     double _w0 = 0;  //
-    double _w1 = 0.5;  //
+    double _w1 = 01;  //
     double _w2 = 3;  //
     double _Kp = 20;  // p term parameter
     double Tp = 150;
@@ -102,7 +103,7 @@ void TrackClass::Tracking(int l2, int l1, int m0, int r1, int r2) {
     double vR = Tp - power_correction; 
     double vL = Tp + power_correction;
     
-    // double adj_R = 1.055, adj_L = 1; // 馬達轉速修正係數。MotorWriting(_Tp,_Tp)如果歪掉就要用參數修正。
+    double adj_R = 1.015, adj_L = 1; // 馬達轉速修正係數。MotorWriting(_Tp,_Tp)如果歪掉就要用參數修正。
 
     if (vR > 255)
         vR = 255;
@@ -113,13 +114,13 @@ void TrackClass::Tracking(int l2, int l1, int m0, int r1, int r2) {
     if (vL < -255)
         vL = -255;
 
-    TrackClass::MotorWriting(vL, vR);
+    TrackClass::MotorWriting(adj_L * vL, adj_R * vR);
 }  // tracking
 
 void TrackClass::QuarterCircleLeft() {
     TrackClass::MotorWriting(-120, 120);
-    delay(150);
-    while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
+    delay(125);
+    while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) { // BBBBB
         TrackClass::MotorWriting(-120, 120);
     }
 
@@ -130,7 +131,7 @@ void TrackClass::QuarterCircleLeft() {
 
 void TrackClass::QuarterCircleRight() {
     TrackClass::MotorWriting(120, -120);
-    delay(150);
+    delay(125);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(120, -120);
     }
@@ -142,13 +143,13 @@ void TrackClass::QuarterCircleRight() {
 
 void TrackClass::UTurn() {
     TrackClass::MotorWriting(150, -150);
-    delay(150);
+    delay(125);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(150, -150);
     }
 
-    while (digitalRead(36) == 0) {
-        TrackClass::MotorWriting(150, -150);
+    while (digitalRead(34) == 0) {
+        TrackClass::MotorWriting(125, -125);
     }
 }
 
@@ -166,6 +167,13 @@ void TrackClass::OldQuarterCircleL() {
     TrackClass::MotorWriting(-150, 150);
     delay(425);
 }
+
+void TrackClass::SlowDown() {
+    delay(225);
+    track.MotorWriting(0, 0);
+}
+
+TrackClass track = TrackClass();
 
 /*以下為轉彎函數 by鄭睿昕
 void TrackClass::LeftTurn3rd() {
@@ -259,10 +267,3 @@ void TrackClass::UTurn3rd() {
     }
 }
 */
-
-void TrackClass::SlowDown() {
-    delay(150);
-    track.MotorWriting(0, 0);
-}
-
-TrackClass track = TrackClass();
