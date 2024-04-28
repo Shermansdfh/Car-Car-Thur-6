@@ -386,11 +386,9 @@ if __name__ == "__main__":
     print((maze.BFS_2_distance(Node(6), Node(12))))
     print(maze.AllManhattanDistance(Node(6)))
     print
-    '''node_num = maze.get_node_number()
+    '''
+    node_num = maze.get_node_number()
     node_dict = maze.get_node_dict()
     for i in node_dict.keys():    
-        print(i)'''
-    '''if self.raw_data[ix,iy] == self.raw_data[ix,iy]:
-                    cell_read = int(self.raw_data[ix,iy])
-                else:
-                    cell_read = 0'''
+        print(i)
+    '''
