@@ -4,8 +4,6 @@ from time import sleep
 import serial
 import sys
 
-from node import Direction
-from maze import Action
 from BT import Bluetooth
 
 log = logging.getLogger(__name__)
@@ -32,15 +30,18 @@ class BTInterface:
         self.bt.serial_write_string("s")
         return
 
-    def get_char(self):
-        return self.bt.serial_read_byte()
-    
     def get_UID(self):
         return self.bt.serial_read_byte()
     
     def g_cmd_gotten_by_python(self):
+        """
+        Reads exactly two char(four bytes) from the input buffer.
+
+        Returns:
+            bool: Whether "g\n" is gotten by python.
+        """
         temp = self.bt.serial.read(2).decode() # read(2): 'g' & '\n
-        print(f"FUNCTION: BTinterface g_cmd_gotten_by_python read in: {temp}")
+        log.info(f"g_cmd_gotten_by_python' read in: {temp}.")
         if "g" in temp:
             return True
         else:
@@ -54,49 +55,22 @@ class BTInterface:
         self.bt.serial.write(output)
         return
     
-    def send_action_to_car_through_enum(self, action: Action):
-    # Send the action to the car
-        if action == Action.ADVANCE:
-            self.bt.serial_write_string("f")
-            print("f")
-            log.info("Sending forward command")
-        elif action == Action.U_TURN:
-            self.bt.serial_write_string("b")
-            print("b")
-            log.info("Sending back turn command")
-        elif action == Action.TURN_RIGHT:
-            self.bt.serial_write_string("r")
-            print("r")
-            log.info("Sending right turn command")
-        elif action == Action.TURN_LEFT:
-            self.bt.serial_write_string("l")
-            print("l")
-            log.info("Sending left turn command")
-        elif action == Action.HALT:
-            log.info("Halting the car")
-            self.bt.serial_write_string("h")
-            print("l")
-        else:
-            log.warning(f"Invalid action: {action}")
-        return
-    
-    def send_action_to_car(self, dir):
+    def send_action_to_car(self, dir: str):
         if dir == "forward":
             self.bt.serial_write_string("f")
-            print("f")
             log.info("Sending forward command")
         elif dir == "backward":
             self.bt.serial_write_string("b")
-            print("b")
             log.info("Sending back turn command")
         elif dir == "left":
-            print("l")
             self.bt.serial_write_string("l")
             log.info("Sending left turn command")
         elif dir == "right":
             self.bt.serial_write_string("r")
-            print("r")
             log.info("Sending right turn command")
+        elif dir == "halt":
+            self.bt.serial_write_string("h")
+            log.info("Sending halt command")
         else:
             log.warning(f"Invalid action: {dir}")
         return
@@ -151,7 +125,6 @@ if __name__ == "__main__":
 '''
 
 ''' BT control write()測試
-if __name__ == "__main__":
     bt = BTInterface("COM5")
     
     while not bt.is_open():
