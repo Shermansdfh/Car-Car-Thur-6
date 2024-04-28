@@ -5,7 +5,8 @@ from node import Node
 
 class BruteForce:
     def __init__(self, maze_file, start_node_idx: int):
-        """ Initializes the BruteForce object.
+        """ 
+        Initializes the BruteForce object.
 
         Args:
             maze_file (str): The file path of the maze CSV file.
@@ -18,7 +19,8 @@ class BruteForce:
         self.scores = self.calculate_scores()
 
     def get_dead_end(self):
-        """ Finds the dead end nodes in the maze.
+        """ 
+        Finds the dead end nodes in the maze.
 
         Returns:
             list: A list of dead end nodes.
