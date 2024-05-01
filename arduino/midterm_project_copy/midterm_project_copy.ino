@@ -61,7 +61,7 @@ void setup() {
 
 /*===========================initialize variables===========================*/
 int l2 = 0, l1 = 0, m0 = 0, r1 = 0, r2 = 0;  // 紅外線模組的讀值(0->white,1->black)
-int _Tp = 180;                                // set your own value for motor power
+int _Tp = 200;                                // set your own value for motor power
 double last_error = 0.0; 
 bool state = false;     // set state to false to halt the car, set state to true to activate the car
 bool RFID_scanned = false;
@@ -116,8 +116,8 @@ void SetState() {
                     RFID_scanned = true;
 
                     BT.ask_BT(); // Clean cmd
-                    delay(100);
-                    goto back;
+                    delay(200);
+                    goto early_backward;
                 }
 
                 if (on_node == 0 &&
@@ -155,8 +155,8 @@ void SetState() {
                     RFID_scanned = true;
 
                     BT.ask_BT(); // Clean cmd
-                    delay(100);
-                    goto back;
+                    delay(200);
+                    goto early_backward;
                 }
 
                 if (on_node == 0 &&
@@ -190,7 +190,7 @@ void SetState() {
 
                     BT.ask_BT(); // Clean cmd
                     delay(100);
-                    goto back;
+                    goto early_backward;
                 }
                 if (on_node == 0 &&
                     NodeDetected(digitalRead(IRpin_LL),
@@ -207,11 +207,9 @@ void SetState() {
             break;
 
         case BluetoothClass::Backward:
-        back:            
             BT.send_msg('g');
             Serial.println("backward gotcha!");
             track.UTurn();
-
             DetectRFID();
 
             while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)) {
@@ -233,6 +231,38 @@ void SetState() {
                                 digitalRead(IRpin_RR))) {
                     on_node = 1;
                 }
+            }
+
+            track.MotorWriting(115, 130);
+            track.SlowDown();
+            break;       
+        early_backward:
+            track.UTurn();
+            int loop_cnt = 0;
+            bool msg_sent = false;
+
+            while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)) {
+                track.Tracking(
+                    digitalRead(IRpin_LL),
+                    digitalRead(IRpin_L),
+                    digitalRead(IRpin_M),
+                    digitalRead(IRpin_R),
+                    digitalRead(IRpin_RR)
+                );
+                if (loop_cnt > 4 && !msg_sent) {
+                    BT.send_msg('g');
+                    Serial.println("backward gotcha!");
+                    msg_sent = true;
+                }
+                if (on_node == 0 &&
+                    NodeDetected(digitalRead(IRpin_LL),
+                                digitalRead(IRpin_L),
+                                digitalRead(IRpin_M),   
+                                digitalRead(IRpin_R),
+                                digitalRead(IRpin_RR))) {
+                    on_node = 1;
+                }
+                loop_cnt++;
             }
 
             track.MotorWriting(115, 130);
