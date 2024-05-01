@@ -111,14 +111,16 @@ class ScoreboardServer(Scoreboard):
         """Send {UID_str} to server to update score. Returns nothing."""
         log.debug(f"Adding UID: {UID_str}")
 
-        if not isinstance(UID_str, str):
-            raise ValueError(f"UID format error! (expected: str) (got: {UID_str})")
+        try:
+            if not isinstance(UID_str, str):
+                raise ValueError(f"UID format error! (expected: str) (got: {UID_str})")
 
-        if not re.match(r"^[0-9A-Fa-f]{8}$", UID_str):
-            raise ValueError(
-                f"UID format error! (expected: 8 hex digits) (got: {UID_str})"
-            )
-
+            if not re.match(r"^[0-9A-Fa-f]{8}$", UID_str):
+                raise ValueError(
+                    f"UID format error! (expected: 8 hex digits) (got: {UID_str})"
+                )
+        except ValueError:
+            return 0, 0
         res = self.socket.call("add_UID", UID_str, namespace="/team")
         if not res:
             log.error("Failed to add UID")

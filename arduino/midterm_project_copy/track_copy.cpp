@@ -119,7 +119,7 @@ void TrackClass::Tracking(int l2, int l1, int m0, int r1, int r2) {
 
 void TrackClass::QuarterCircleLeft() {
     TrackClass::MotorWriting(-120, 120);
-    delay(125);
+    delay(110);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) { // BBBBB
         TrackClass::MotorWriting(-120, 120);
     }
@@ -131,7 +131,7 @@ void TrackClass::QuarterCircleLeft() {
 
 void TrackClass::QuarterCircleRight() {
     TrackClass::MotorWriting(120, -120);
-    delay(125);
+    delay(110);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(120, -120);
     }
@@ -143,7 +143,7 @@ void TrackClass::QuarterCircleRight() {
 
 void TrackClass::UTurn() {
     TrackClass::MotorWriting(150, -150);
-    delay(125);
+    delay(95);
     while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
         TrackClass::MotorWriting(150, -150);
     }

@@ -40,9 +40,16 @@ class BTInterface:
         Returns:
             bool: Whether "g\n" is gotten by python.
         """
-        temp = self.bt.serial.read(2).decode() # read(2): 'g' & '\n
-        log.info(f"g_cmd_gotten_by_python' read in: {temp}.")
-        if "g" in temp:
+        try:
+            temp = self.bt.serial.read(2).decode() # read(2): 'g' & '\n
+            log.info(f"g_cmd_gotten_by_python read in: {temp}.")
+        except UnicodeDecodeError as e:
+        # Check if the error message matches the specific error you want to catch
+            if str(e) == "\'utf-8\' codec can\'t decode byte 0xa8 in position 1: invalid start byte":
+                temp = "g\n"
+        
+        if "g" in temp or "\n" in temp:
+            log.info(f"g or \\n in temp:")
             return True
         else:
             return False
