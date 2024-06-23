@@ -28,7 +28,7 @@ class BruteForce:
         dead_ends = []
         for i in self.maze.node_dict.keys():
             if (self.maze.node_dict[i][1]):
-                if (i != 5 and i != 0):
+                if (i != 5 and i != 0 and i != 3):
                     # print("dead_ends" + str(i))
                     dead_ends.append(self.maze.node_dict[i][0])
         return dead_ends
@@ -56,6 +56,7 @@ class BruteForce:
         max_score = 0
 
         for permutation in itertools.permutations(self.dead_ends_list):
+            # iterate all possible permutations of dead ends
             current_score = 0
             distances = 0
             current_path = []
@@ -70,7 +71,7 @@ class BruteForce:
                     distance = self.distances[start_node_index][node_index]
                 except KeyError:
                     print(f"Warning: Distance between nodes {start_node_index} and {node_index} not found in self.distances.")
-                    distance = float('inf')  # Or handle the case in a different way
+                    distance = float('inf')  
                 distances += distance
                 if distances >= maximum_distance:
                     break
@@ -88,6 +89,6 @@ class BruteForce:
 if __name__ == "__main__":
     maze_file = "python/data/big_maze_112.csv"
     brute_force = BruteForce(maze_file, 6)
-    optimal_path, max_score = brute_force.find_optimal_path(40)
+    optimal_path, max_score = brute_force.find_optimal_path(39)
     print(f"Optimal path: {optimal_path}")
     print(f"Maximum score: {max_score}")

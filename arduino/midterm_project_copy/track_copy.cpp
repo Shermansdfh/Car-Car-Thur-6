@@ -120,11 +120,20 @@ void TrackClass::Tracking(int l2, int l1, int m0, int r1, int r2) {
 void TrackClass::QuarterCircleLeft() {
     TrackClass::MotorWriting(-120, 120);
     delay(110);
-    while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) { // BBBBB
+    // Turn for a fixed time
+
+    while (!(digitalRead(40) == 0 && 
+         digitalRead(38) == 0 && 
+         digitalRead(36) == 0 && 
+         digitalRead(34) == 0 && 
+         digitalRead(32) == 0)) {
+
+        // Keep spinning until there is no black detected
         TrackClass::MotorWriting(-120, 120);
     }
 
-    while (digitalRead(36) == 0) {
+    while (digitalRead(38) == 0 && digitalRead(36) == 0) {
+        // Spin unitl one of m0 or l1 deteced black
         TrackClass::MotorWriting(-120, 120);
     }
 }
@@ -132,11 +141,20 @@ void TrackClass::QuarterCircleLeft() {
 void TrackClass::QuarterCircleRight() {
     TrackClass::MotorWriting(120, -120);
     delay(110);
-    while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
+    // Turn for a fixed time
+
+    while (!(digitalRead(40) == 0 && 
+         digitalRead(38) == 0 && 
+         digitalRead(36) == 0 && 
+         digitalRead(34) == 0 && 
+         digitalRead(32) == 0)) {
+
+        // Keep spinning until there is no black detected
         TrackClass::MotorWriting(120, -120);
     }
 
-    while (digitalRead(36) == 0) {
+    while (digitalRead(36) == 0 && digitalRead(34) == 0) { 
+        // Spin unitl one of m0 or r1 deteced black
         TrackClass::MotorWriting(120, -120);
     }
 }
@@ -144,11 +162,20 @@ void TrackClass::QuarterCircleRight() {
 void TrackClass::UTurn() {
     TrackClass::MotorWriting(150, -150);
     delay(95);
-    while (!(digitalRead(40) == 0 && digitalRead(38) == 0 && digitalRead(36) == 0 && digitalRead(34) == 0 && digitalRead(32) == 0)) {
+    // Turn for a fixed time
+
+    while (!(digitalRead(40) == 0 && 
+         digitalRead(38) == 0 && 
+         digitalRead(36) == 0 && 
+         digitalRead(34) == 0 && 
+         digitalRead(32) == 0)) {
+
+        // Keep spinning until there is no black detected
         TrackClass::MotorWriting(150, -150);
     }
 
     while (digitalRead(34) == 0) {
+        // Spin unitl one of m0 or r1 deteced black
         TrackClass::MotorWriting(125, -125);
     }
 }
@@ -169,7 +196,7 @@ void TrackClass::OldQuarterCircleL() {
 }
 
 void TrackClass::SlowDown() {
-    delay(225);
+    delay(180);
     track.MotorWriting(0, 0);
 }
 

@@ -61,7 +61,7 @@ void setup() {
 
 /*===========================initialize variables===========================*/
 int l2 = 0, l1 = 0, m0 = 0, r1 = 0, r2 = 0;  // 紅外線模組的讀值(0->white,1->black)
-int _Tp = 200;                                // set your own value for motor power
+int _Tp = 240;                                // set your own value for motor power
 double last_error = 0.0; 
 bool state = false;     // set state to false to halt the car, set state to true to activate the car
 bool RFID_scanned = false;
@@ -206,11 +206,12 @@ void SetState() {
             track.SlowDown();
             break;
 
-        case BluetoothClass::Backward:
+        case BluetoothClass::Backward: 
+            // uid not scanned at first
             BT.send_msg('g');
             Serial.println("backward gotcha!");
             track.UTurn();
-            DetectRFID();
+            int loop_cnt = 0;
 
             while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)) {
                 track.Tracking(
@@ -220,8 +221,10 @@ void SetState() {
                     digitalRead(IRpin_R),
                     digitalRead(IRpin_RR)
                 );
-                if (DetectRFID()) {
-                    RFID_scanned = true;
+                if (loop_cnt>=2 && loop_cnt<=5) {
+                    if (DetectRFID()) {
+                        RFID_scanned = true;
+                    }
                 }
                 if (on_node == 0 &&
                     NodeDetected(digitalRead(IRpin_LL),
@@ -231,6 +234,8 @@ void SetState() {
                                 digitalRead(IRpin_RR))) {
                     on_node = 1;
                 }
+                loop_cnt++;
+                
             }
 
             track.MotorWriting(115, 130);
@@ -238,10 +243,10 @@ void SetState() {
             break;       
         early_backward:
             track.UTurn();
-            int loop_cnt = 0;
+            int loop_cnt_early = 0;
             bool msg_sent = false;
 
-            while(!(on_node && digitalRead(IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)) {
+            while(!(on_node && digitalRead  (IRpin_LL) == 0 && digitalRead(IRpin_RR) == 0)) {
                 track.Tracking(
                     digitalRead(IRpin_LL),
                     digitalRead(IRpin_L),
@@ -249,7 +254,7 @@ void SetState() {
                     digitalRead(IRpin_R),
                     digitalRead(IRpin_RR)
                 );
-                if (loop_cnt > 4 && !msg_sent) {
+                if (loop_cnt_early > 4 && !msg_sent) {
                     BT.send_msg('g');
                     Serial.println("backward gotcha!");
                     msg_sent = true;
@@ -262,7 +267,7 @@ void SetState() {
                                 digitalRead(IRpin_RR))) {
                     on_node = 1;
                 }
-                loop_cnt++;
+                loop_cnt_early ++;
             }
 
             track.MotorWriting(115, 130);

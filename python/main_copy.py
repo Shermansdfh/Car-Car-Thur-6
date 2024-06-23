@@ -18,7 +18,7 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # TODO : Fill in the following information
-TEAM_NAME = "GGGG"
+TEAM_NAME = "GGGG-Thursday-6"
 SERVER_URL = "http://140.112.175.18:5000/"
 MAZE_FILE = "data/small_maze.csv"
 BT_PORT = "COM5"
@@ -41,9 +41,9 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
     # point = ScoreboardFake("your team name", "data/fakeUID.csv") # for local testing
     interface = BTInterface(port=bt_port)
     point = ScoreboardServer(team_name, server_url)
-    routes = ["ffb", "rlb", "rlb"]
-    routes_1 = [
-        "fffrrlb", "rlrfrrlb", "rrb", "frrfllfb", "ffffb",
+    # routes = ["ffb", "rlb", "rlb"]
+    routes = [
+        "fffffrrlb", "rrb", "frrfllfb", "ffffb",
         "llb", "llb", "flb", "rrlrfrrllb", "rrffllb",
         "rrllb", "llrb"
     ]
@@ -66,7 +66,7 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
         return
     
     def uid_gotten() -> bool:
-        scanning_time = 2.15
+        scanning_time = 2.4
         # global g_received  # Declare g_received as a global variable
         # global skip_g_scanning
         log.info(f"Checkpoint: 'b' sent, now scanning for uid for {scanning_time} sec.")   
@@ -158,6 +158,14 @@ def main(mode: int, bt_port: str, team_name: str, server_url: str, maze_file: st
             
     elif mode == "1":
         log.info("Mode 1: Self-testing mode.")
+        while True:
+            uid = interface.get_UID()
+            if uid:
+                log.info(f"UID before strip: {uid}")
+                uid = uid[8:-6] # Strip 0x%%% and $$$
+                uid = uid.upper() # Make UID upper case for server recognition
+                log.info(f"UID received(after strip): {uid}")
+                
     else:
         log.error("Invalid mode")
         sys.exit(1)
